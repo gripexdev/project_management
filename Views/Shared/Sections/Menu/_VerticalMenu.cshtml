@@ -27,7 +27,7 @@
   @* ! Full version menu-items *@
   <ul class="menu-inner py-1">
     <!-- Dashboards -->
-    <li class='menu-item@(currentPage.EndsWith("/") || currentPage.StartsWith("/Dashboards/") ? " active open" : "")'>
+    <li class='menu-item@(currentPage.EndsWith("/") || currentPage.StartsWith("/Dashboards/") || currentPage.EndsWith("") ? " active open" : "")'>
       <a href="javascript:void(0);" class="menu-link menu-toggle">
         <i class="menu-icon tf-icons bx bx-home-smile"></i>
         <div class="text-truncate" data-i18n="Dashboards">Dashboards</div>
@@ -39,24 +39,9 @@
             <div>Analytics</div>
           </a>
         </li>
-        <li class='menu-item@(currentPage == "/Dashboards/CRM" ? " active" : "")'>
-          <a href="https://demos.themeselection.com/sneat-aspnet-core-mvc-admin-template/html/vertical-menu-template/dashboards-crm.html" target="_blank" class="menu-link">
-            <div>CRM</div><div class="badge bg-label-primary fs-tiny rounded-pill ms-auto text-uppercase">Pro</div>
-          </a>
-        </li>
-        <li class='menu-item@(currentPage == "/Ecommerce/Dashboard" ? " active" : "")'>
-          <a href="https://demos.themeselection.com/sneat-aspnet-core-mvc-admin-template/html/vertical-menu-template/app-ecommerce-dashboard.html" target="_blank" class="menu-link">
-            <div>eCommerce</div><div class="badge bg-label-primary fs-tiny rounded-pill ms-auto text-uppercase">Pro</div>
-          </a>
-        </li>
-        <li class='menu-item@(currentPage == "/Logistics/Dashboard" ? " active" : "")'>
-          <a href="https://demos.themeselection.com/sneat-aspnet-core-mvc-admin-template/html/vertical-menu-template/app-logistics-dashboard.html" target="_blank" class="menu-link">
-            <div>Logistics</div><div class="badge bg-label-primary fs-tiny rounded-pill ms-auto text-uppercase">Pro</div>
-          </a>
-        </li>
-        <li class='menu-item@(currentPage == "/Academy/Dashboard" ? " active" : "")'>
-          <a href="https://demos.themeselection.com/sneat-aspnet-core-mvc-admin-template/html/vertical-menu-template/app-academy-dashboard.html" target="_blank" class="menu-link">
-            <div>Academy</div><div class="badge bg-label-primary fs-tiny rounded-pill ms-auto text-uppercase">Pro</div>
+        <li class='menu-item@(currentPage == "/Project" ? " active" : "")'>
+          <a asp-controller="Project" asp-action="Index" class="menu-link">
+            <div>Projects</div>
           </a>
         </li>
       </ul>
