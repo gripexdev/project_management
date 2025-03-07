@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using ProjectDashboard.Models;
 using ProjectDashboard.Data;
-using Microsoft.EntityFrameworkCore; // Required for Skip and Take methods
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization; // Required for Skip and Take methods
 
 namespace ProjectDashboard.Controllers
 {
+    [Authorize]
     public class ProjectController : Controller
     {
         private readonly ILogger<ProjectController> _logger;
