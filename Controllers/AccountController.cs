@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ProjectDashboard.Data;
 using ProjectDashboard.Models;
 
 public class AccountController : Controller
@@ -7,10 +8,13 @@ public class AccountController : Controller
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
 
-    public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+    private readonly AppDbContext _context;
+
+    public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, AppDbContext context)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _context = context;
     }
 
     [HttpGet]
@@ -20,27 +24,45 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Register(Employee model)
+public async Task<IActionResult> Register(Employee model)
+{
+    if (ModelState.IsValid)
     {
-        if (ModelState.IsValid)
+        // Create a new IdentityUser (or Employee if using custom user class)
+        var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+        var result = await _userManager.CreateAsync(user, model.Password);
+
+        if (result.Succeeded)
         {
-            var user = new IdentityUser { UserName = model.Email, Email = model.Email };
-            var result = await _userManager.CreateAsync(user, model.Password);
-
-            if (result.Succeeded)
+            // Optionally, add additional fields to the Employee table
+            var employee = new Employee
             {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Index", "Home");
-            }
+                Name = model.Name,
+                Cin = model.Cin,
+                Email = model.Email,
+                Password = model.Password, // Note: Store hashed password in production
+                Role = "User", // Default role
+                CreatedAt = DateTime.UtcNow
+            };
 
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
+            // Save the employee to the database (if using a separate Employee table)
+            _context.Employees.Add(employee);
+            _context.SaveChanges();
+
+            // Sign in the user
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return RedirectToAction("Index", "Home");
         }
 
-        return View(model);
+        // Add errors to ModelState
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError(string.Empty, error.Description);
+        }
     }
+
+    return View(model);
+}
 
     [HttpGet]
     public IActionResult Login()
@@ -66,7 +88,7 @@ public class AccountController : Controller
         return View(model);
     }
 
-    [HttpPost]
+    [HttpGet]
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();

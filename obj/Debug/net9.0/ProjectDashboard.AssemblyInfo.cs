@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ProjectDashboard")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+98d561695e8b28d213c4c9d74063f469f24a735c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2273cb1a8f4f61ae8d9d6706fcbb6a2930c8a546")]
 [assembly: System.Reflection.AssemblyProductAttribute("ProjectDashboard")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ProjectDashboard")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

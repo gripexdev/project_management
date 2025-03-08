@@ -1,3 +1,5 @@
+namespace ProjectDashboard.Models;
+
 using System.ComponentModel.DataAnnotations;
 
 public class LoginView
