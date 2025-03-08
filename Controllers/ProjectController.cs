@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization; // Required for Skip and Take methods
 
 namespace ProjectDashboard.Controllers
 {
-    [Authorize]
+    //[Authorize] // Uncomment this line to require authentication
     public class ProjectController : Controller
     {
         private readonly ILogger<ProjectController> _logger;
@@ -28,7 +28,7 @@ namespace ProjectDashboard.Controllers
 
             // Fetch paginated projects
             var projects = _context.Projects
-                .OrderBy(p => p.Id) 
+                .OrderBy(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -43,6 +43,25 @@ namespace ProjectDashboard.Controllers
             };
 
             return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Add(Project project)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Projects.Add(project);
+                _context.SaveChanges();
+                return Json(new { success = true, message = "Project added successfully!" });
+            }
+
+            // Extract validation errors
+            var errors = ModelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+            );
+
+            return Json(new { success = false, message = "Failed to add project. Please check the fields.", errors });
         }
     }
 }

@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "/Users/omarelkhotri/Projects/personal/project_management/ProjectDashboard.csproj": {}
+    "C:\\Users\\admin\\CsharpProjects\\ProjectDashboard\\ProjectDashboard.csproj": {}
   },
   "projects": {
-    "/Users/omarelkhotri/Projects/personal/project_management/ProjectDashboard.csproj": {
+    "C:\\Users\\admin\\CsharpProjects\\ProjectDashboard\\ProjectDashboard.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/omarelkhotri/Projects/personal/project_management/ProjectDashboard.csproj",
+        "projectUniqueName": "C:\\Users\\admin\\CsharpProjects\\ProjectDashboard\\ProjectDashboard.csproj",
         "projectName": "ProjectDashboard",
-        "projectPath": "/Users/omarelkhotri/Projects/personal/project_management/ProjectDashboard.csproj",
-        "packagesPath": "/Users/omarelkhotri/.nuget/packages/",
-        "outputPath": "/Users/omarelkhotri/Projects/personal/project_management/obj/",
+        "projectPath": "C:\\Users\\admin\\CsharpProjects\\ProjectDashboard\\ProjectDashboard.csproj",
+        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\admin\\CsharpProjects\\ProjectDashboard\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/omarelkhotri/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -92,7 +98,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

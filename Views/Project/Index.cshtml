@@ -5,11 +5,18 @@
 }
 
 <div class="card">
-    <h5 class="card-header">Projects</h5>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Projects</h5>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProjectModal">
+            Add Project
+        </button>
+    </div>
+
     <div class="table-responsive text-nowrap">
-        @if (Model.Projects == null || !Model.Projects.Any())  
+        @if (Model.Projects == null || !Model.Projects.Any())
         {
-            <p style="text-align: center;">No projects at the moment.</p> 
+            <p style="text-align: center;">No projects at the moment.</p>
         }
         else
         {
@@ -72,7 +79,8 @@
                     @if (Model.CurrentPage > 1)
                     {
                         <li class="page-item">
-                            <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage - 1, pageSize = Model.PageSize })">Previous</a>
+                            <a class="page-link"
+                                href="@Url.Action("Index", new { page = Model.CurrentPage - 1, pageSize = Model.PageSize })">Previous</a>
                         </li>
                     }
                     @for (int i = 1; i <= Model.TotalPages; i++)
@@ -84,7 +92,8 @@
                     @if (Model.CurrentPage < Model.TotalPages)
                     {
                         <li class="page-item">
-                            <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage + 1, pageSize = Model.PageSize })">Next</a>
+                            <a class="page-link"
+                                href="@Url.Action("Index", new { page = Model.CurrentPage + 1, pageSize = Model.PageSize })">Next</a>
                         </li>
                     }
                 </ul>
@@ -92,3 +101,164 @@
         }
     </div>
 </div>
+
+<div class="mt-4">
+
+    <!-- Modal -->
+    <div class="modal fade" id="addProjectModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Project</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="addProjectForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" id="name" name="Name" class="form-control">
+                            <span class="text-danger" id="nameError"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea id="description" name="Description" class="form-control"></textarea>
+                            <span class="text-danger" id="descriptionError"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" id="startDate" name="StartDate" class="form-control">
+                            <span class="text-danger" id="startDateError"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">End Date</label>
+                            <input type="date" id="endDate" name="EndDate" class="form-control">
+                            <span class="text-danger" id="endDateError"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select id="status" name="Status" class="form-control">
+                                <option value="Pending">Pending</option>
+                                <option value="InProgress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                            <span class="text-danger" id="statusError"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toastContainer" aria-live="polite" aria-atomic="true"
+    class="position-relative ui-bg-overlay rounded-end-bottom">
+    <!-- Toast notifications will be appended here -->
+</div>
+
+@* TODO: put js code in a separate file *@
+@section PageScripts {
+    <script src="~/js/ui-toasts.js"></script>
+    <script>
+        document.getElementById('addProjectForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+
+            fetch('@Url.Action("Add", "Project")', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response Data:', data); // Debugging
+                    if (data.success) {
+                        // Show success toast
+                        showToast('success', data.message);
+                        // Close the modal
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('addProjectModal'));
+                        modal.hide();
+                        // Optionally, refresh the page or update the table
+                        window.location.reload();
+                    } else {
+                        // Show error toast
+                        showToast('error', data.message);
+                        // Clear previous errors
+                        document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
+                        // Display validation errors
+                        for (var field in data.errors) {
+                            var errorElement = document.getElementById(field.toLowerCase() + 'Error'); // Ensure lowercase
+                            if (errorElement) {
+                                errorElement.textContent = data.errors[field].join(', ');
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        @* FIXME: fix success toast not showing *@
+        function showToast(type, message) {
+            // Create toast element
+            var toastElement = document.createElement('div');
+            toastElement.className = `bs-toast toast toast-placement-ex m-2 ${type === 'error' ? 'bg-danger' : 'bg-info'}`;
+            toastElement.setAttribute('role', 'alert');
+            toastElement.setAttribute('aria-live', 'assertive');
+            toastElement.setAttribute('aria-atomic', 'true');
+            toastElement.setAttribute('data-bs-delay', '2000');
+
+            // Add toast header
+            var toastHeader = document.createElement('div');
+            toastHeader.className = 'toast-header';
+            toastHeader.innerHTML = `
+                        <i class='bx bx-bell me-2'></i>
+                        <div class="me-auto fw-medium">${type === 'error' ? 'Error' : 'Success'}</div>
+                        <small>Just now</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    `;
+
+            // Add toast body
+            var toastBody = document.createElement('div');
+            toastBody.className = 'toast-body';
+            toastBody.textContent = message;
+
+            // Append header and body to toast
+            toastElement.appendChild(toastHeader);
+            toastElement.appendChild(toastBody);
+
+            // Append toast to the toast container
+            var toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.setAttribute('aria-live', 'polite');
+                toastContainer.setAttribute('aria-atomic', 'true');
+                toastContainer.className = 'position-fixed bottom-0 end-0 p-3'; // Position at bottom right
+                document.body.appendChild(toastContainer);
+            }
+            toastContainer.appendChild(toastElement);
+
+            // Initialize and show the toast
+            var toast = new bootstrap.Toast(toastElement, {
+                autohide: true,
+                delay: 2000
+            });
+            toast.show();
+            console.log('Showing toast with message: ', message);
+        }
+
+    </script>
+}
