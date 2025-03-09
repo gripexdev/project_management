@@ -154,10 +154,11 @@
     </div>
 </div>
 
-<div id="toastContainer" aria-live="polite" aria-atomic="true"
-    class="position-relative ui-bg-overlay rounded-end-bottom">
-    <!-- Toast notifications will be appended here -->
+<div id="toastContainer" aria-live="polite" aria-atomic="true" class="position-fixed bottom-0 end-0 p-3"
+    style="z-index: 1100;">
 </div>
+
+
 
 @* TODO: put js code in a separate file *@
 @section PageScripts {
@@ -183,14 +184,20 @@
                 })
                 .then(data => {
                     console.log('Response Data:', data); // Debugging
+                    // when project is successfully added
                     if (data.success) {
                         // Show success toast
-                        showToast('success', data.message);
+                        @* showToast('success', data.message); *@
+
                         // Close the modal
                         var modal = bootstrap.Modal.getInstance(document.getElementById('addProjectModal'));
                         modal.hide();
-                        // Optionally, refresh the page or update the table
-                        window.location.reload();
+
+                        // Wait for the toast to be visible before refreshing
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000); // 1 second
+                        showToast('success', data.message);
                     } else {
                         // Show error toast
                         showToast('error', data.message);
@@ -210,55 +217,33 @@
                 });
         });
 
-        @* FIXME: fix success toast not showing *@
         function showToast(type, message) {
-            // Create toast element
             var toastElement = document.createElement('div');
-            toastElement.className = `bs-toast toast toast-placement-ex m-2 ${type === 'error' ? 'bg-danger' : 'bg-info'}`;
+            toastElement.className = `toast align-items-center text-white ${type === 'error' ? 'bg-danger' : 'bg-success'} border-0 m-2`;
             toastElement.setAttribute('role', 'alert');
             toastElement.setAttribute('aria-live', 'assertive');
             toastElement.setAttribute('aria-atomic', 'true');
-            toastElement.setAttribute('data-bs-delay', '2000');
+            toastElement.setAttribute('data-bs-autohide', 'true');
+            toastElement.setAttribute('data-bs-delay', '3000');
 
-            // Add toast header
-            var toastHeader = document.createElement('div');
-            toastHeader.className = 'toast-header';
-            toastHeader.innerHTML = `
-                        <i class='bx bx-bell me-2'></i>
-                        <div class="me-auto fw-medium">${type === 'error' ? 'Error' : 'Success'}</div>
-                        <small>Just now</small>
-                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                    `;
+            var toastBody = `
+                        <div class="toast-header">
+                            <i class='bx bx-bell me-2'></i>
+                            <strong class="me-auto">Notification</strong>
+                            <small>Just now</small>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            ${message}
+                        </div>`;
 
-            // Add toast body
-            var toastBody = document.createElement('div');
-            toastBody.className = 'toast-body';
-            toastBody.textContent = message;
+            toastElement.innerHTML = toastBody;
 
-            // Append header and body to toast
-            toastElement.appendChild(toastHeader);
-            toastElement.appendChild(toastBody);
-
-            // Append toast to the toast container
             var toastContainer = document.getElementById('toastContainer');
-            if (!toastContainer) {
-                toastContainer = document.createElement('div');
-                toastContainer.id = 'toastContainer';
-                toastContainer.setAttribute('aria-live', 'polite');
-                toastContainer.setAttribute('aria-atomic', 'true');
-                toastContainer.className = 'position-fixed bottom-0 end-0 p-3'; // Position at bottom right
-                document.body.appendChild(toastContainer);
-            }
             toastContainer.appendChild(toastElement);
 
-            // Initialize and show the toast
-            var toast = new bootstrap.Toast(toastElement, {
-                autohide: true,
-                delay: 2000
-            });
+            var toast = new bootstrap.Toast(toastElement);
             toast.show();
-            console.log('Showing toast with message: ', message);
         }
-
     </script>
 }
