@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization; // Required for Skip and Take methods
 
 namespace ProjectDashboard.Controllers
 {
-    [Authorize] 
+    [Authorize]
     public class ProjectController : Controller
     {
         private readonly ILogger<ProjectController> _logger;
@@ -45,6 +45,7 @@ namespace ProjectDashboard.Controllers
             return View(model);
         }
 
+        // Add Project 
         [HttpPost]
         public IActionResult Add(Project project)
         {
@@ -63,5 +64,29 @@ namespace ProjectDashboard.Controllers
 
             return Json(new { success = false, message = "Failed to add project. Please check the fields.", errors });
         }
+
+        // Delete Project
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                var project = _context.Projects.Find(id);
+                if (project == null)
+                {
+                    return Json(new { success = false, message = "Project not found." });
+                }
+
+                _context.Projects.Remove(project);
+                _context.SaveChanges();
+                return Json(new { success = true, message = "Project deleted successfully!" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting project.");
+                return Json(new { success = false, message = "Error deleting project." });
+            }
+        }
+
     }
 }
