@@ -88,5 +88,79 @@ namespace ProjectDashboard.Controllers
             }
         }
 
+        // Get Project by ID
+        [HttpGet]
+        public IActionResult GetProject(int id)
+        {
+            var project = _context.Projects.Find(id);
+            if (project == null)
+            {
+                return Json(new { success = false, message = "Project not found." });
+            }
+
+            // Ensure Status is serialized as a string
+            var projectDto = new
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                StartDate = project.StartDate.ToString("yyyy-MM-dd"),
+                EndDate = project.EndDate.ToString("yyyy-MM-dd"),
+                Status = project.Status.ToString() // Serialize as string
+            };
+
+            return Json(new { success = true, project = projectDto });
+        }
+
+        // Update Project
+        [HttpPost]
+        public IActionResult Update(Project project)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var existingProject = _context.Projects.Find(project.Id);
+                    if (existingProject == null)
+                    {
+                        return Json(new { success = false, message = "Project not found." });
+                    }
+
+                    // Check if the data is unchanged
+                    if (existingProject.Name == project.Name &&
+                        existingProject.Description == project.Description &&
+                        existingProject.StartDate == project.StartDate &&
+                        existingProject.EndDate == project.EndDate &&
+                        existingProject.Status == project.Status)
+                    {
+                        return Json(new { success = false, message = "No changes detected. Data is the same." });
+                    }
+
+                    // Update the existing project with new values
+                    existingProject.Name = project.Name;
+                    existingProject.Description = project.Description;
+                    existingProject.StartDate = project.StartDate;
+                    existingProject.EndDate = project.EndDate;
+                    existingProject.Status = project.Status;
+
+                    _context.SaveChanges();
+                    return Json(new { success = true, message = "Project updated successfully!" });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error updating project.");
+                    return Json(new { success = false, message = "Error updating project." });
+                }
+            }
+
+            // Extract validation errors
+            var errors = ModelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+            );
+
+            return Json(new { success = false, message = "Failed to update project. Please check the fields.", errors });
+        }
+
     }
 }

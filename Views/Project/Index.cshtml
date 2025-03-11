@@ -58,16 +58,17 @@
                                 }
                             </td>
                             <td>
-    <div class="dropdown">
-        <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
-                data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
-        <div class="dropdown-menu">
-            <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-edit-alt me-1"></i> Edit</a>
-            <a class="dropdown-item" href="javascript:void(0);" onclick="deleteProject(@project.Id)"><i class="bx bx-trash me-1"></i> Delete</a>
-        </div>
-    </div>
-</td>
-
+                                <div class="dropdown">
+                                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
+                                        data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="javascript:void(0);"
+                                            onclick="editProject(@project.Id)"><i class="bx bx-edit-alt me-1"></i> Edit</a>
+                                        <a class="dropdown-item" href="javascript:void(0);"
+                                            onclick="deleteProject(@project.Id)"><i class="bx bx-trash me-1"></i> Delete</a>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -103,7 +104,7 @@
 
 <div class="mt-4">
 
-    <!-- Modal -->
+    <!-- Add Project Modal -->
     <div class="modal fade" id="addProjectModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -153,6 +154,57 @@
     </div>
 </div>
 
+<!-- Edit Project Modal -->
+<div class="modal fade" id="editProjectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Project</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editProjectForm">
+                <input type="hidden" id="editId" name="Id" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" id="editName" name="Name" class="form-control">
+                        <span class="text-danger" id="editNameError"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea id="editDescription" name="Description" class="form-control"></textarea>
+                        <span class="text-danger" id="editDescriptionError"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" id="editStartDate" name="StartDate" class="form-control">
+                        <span class="text-danger" id="editStartDateError"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">End Date</label>
+                        <input type="date" id="editEndDate" name="EndDate" class="form-control">
+                        <span class="text-danger" id="editEndDateError"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select id="editStatus" name="Status" class="form-control">
+                            <option value="Pending">Pending</option>
+                            <option value="InProgress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                        <span class="text-danger" id="editStatusError"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container -->
 <div id="toastContainer" aria-live="polite" aria-atomic="true" class="position-fixed bottom-0 end-0 p-3"
     style="z-index: 1100;">
 </div>
@@ -190,8 +242,8 @@
                         // Show success toast
                         @* showToast('success', data.message); *@
 
-                        // Close the modal
-                        var modal = bootstrap.Modal.getInstance(document.getElementById('addProjectModal'));
+                                            // Close the modal
+                                            var modal = bootstrap.Modal.getInstance(document.getElementById('addProjectModal'));
                         modal.hide();
 
                         // Wait for the toast to be visible before refreshing
@@ -230,28 +282,112 @@
                         'Accept': 'application/json'
                     }
                 })
-                
+
+                    .then(response => response.json())
+                    .then(data => {
+
+                        console.log('Response Data:', data); // Debugging
+
+                        // Show success or error toast based on the response
+                        if (data.success) {
+                            showToast('success', data.message);
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000); // 1 second
+                        } else {
+                            showToast('error', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('error', 'Error deleting project.');
+                    });
+            }
+        }
+
+        // Edit Project handling - Fetch project details and show the modal
+        function editProject(projectId) {
+            fetch(`@Url.Action("GetProject", "Project")?id=${projectId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
-
-                    console.log('Response Data:', data); // Debugging
-
-                    // Show success or error toast based on the response
                     if (data.success) {
-                        showToast('success', data.message);
-                        setTimeout(() => {
-                                    window.location.reload();
-                                }, 1000); // 1 second
+                        const project = data.project;
+                        document.getElementById('editId').value = project.id;
+                        document.getElementById('editName').value = project.name;
+                        document.getElementById('editDescription').value = project.description;
+                        document.getElementById('editStartDate').value = project.startDate; // Already formatted as yyyy-MM-dd
+                        document.getElementById('editEndDate').value = project.endDate;   // Already formatted as yyyy-MM-dd
+
+                        // Set the selected status in the dropdown
+                        const statusDropdown = document.getElementById('editStatus');
+                        Array.from(statusDropdown.options).forEach(option => {
+                            option.selected = option.value === project.status; // Match the value
+                        });
+
+                        // Show the modal
+                        const editModal = new bootstrap.Modal(document.getElementById('editProjectModal'));
+                        editModal.show();
                     } else {
                         showToast('error', data.message);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showToast('error', 'Error deleting project.');
+                    showToast('error', 'Error fetching project details.');
                 });
-            }
         }
+
+        // Handle form submission for editing projects
+        document.getElementById('editProjectForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            fetch('@Url.Action("Update", "Project")', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Close the modal
+                        const editModal = bootstrap.Modal.getInstance(document.getElementById('editProjectModal'));
+                        editModal.hide();
+
+                        // Show success toast and reload the page
+                        showToast('success', data.message);
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000); // 1 second
+                    } else {
+                        // Show error toast
+                        showToast('error', data.message);
+
+                        // Clear previous errors
+                        document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
+
+                        // Display validation errors if any
+                        if (data.errors) {
+                            for (var field in data.errors) {
+                                var errorElement = document.getElementById(`edit${field.charAt(0).toUpperCase() + field.slice(1)}Error`);
+                                if (errorElement) {
+                                    errorElement.textContent = data.errors[field].join(', ');
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('error', 'Error updating project.');
+                });
+        });
 
         // Show toast message
         function showToast(type, message) {
@@ -264,15 +400,15 @@
             toastElement.setAttribute('data-bs-delay', '3000');
 
             var toastBody = `
-                        <div class="toast-header">
-                            <i class='bx bx-bell me-2'></i>
-                            <strong class="me-auto">Notification</strong>
-                            <small>Just now</small>
-                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                        </div>
-                        <div class="toast-body">
-                            ${message}
-                        </div>`;
+                                            <div class="toast-header">
+                                                <i class='bx bx-bell me-2'></i>
+                                                <strong class="me-auto">Notification</strong>
+                                                <small>Just now</small>
+                                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                            </div>
+                                            <div class="toast-body">
+                                                ${message}
+                                            </div>`;
 
             toastElement.innerHTML = toastBody;
 
