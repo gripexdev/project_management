@@ -12,7 +12,7 @@ namespace ProjectDashboard.Models
         public string Name { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "CIN is required")]
-        [StringLength(10, ErrorMessage = "CIN must be 10 characters")]
+        [StringLength(8, ErrorMessage = "CIN must be 8 characters")]
         public string Cin { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email is required")]

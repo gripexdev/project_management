@@ -9,10 +9,9 @@ namespace ProjectDashboard.Controllers
     [Authorize]
     public class EmployeeController : Controller
     {
-
+        private readonly AppDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly AppDbContext _context;
 
         public EmployeeController(AppDbContext context, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
@@ -26,29 +25,33 @@ namespace ProjectDashboard.Controllers
             var totalEmployees = _context.Employees.Count();
             var totalPages = (int)Math.Ceiling(totalEmployees / (double)pageSize);
 
-            //fetch
             var employees = _context.Employees
-                  .OrderBy(e => e.Id)
-                  .Skip((page - 1) * pageSize)
-                  .Take(pageSize)
-                  .ToList();
+                .OrderBy(e => e.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-            //pass data to view
-            ViewBag.totalPages = totalPages;
-            ViewBag.currentPage = page;
-            ViewBag.pageSize = pageSize;
+            var model = new EmployeeIndexViewModel
+            {
+                Employees = employees,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                PageSize = pageSize
+            };
 
-            return View(employees);
+            return View(model);
         }
 
+
         [HttpPost]
-        public async Task<IActionResult> Add(Employee employee)
+        public IActionResult Add(Employee employee)
         {
             if (ModelState.IsValid)
             {
+
                 // Create IdentityUser
                 var user = new IdentityUser { UserName = employee.Email, Email = employee.Email };
-                var result = await _userManager.CreateAsync(user, employee.Password);
+                var result = _userManager.CreateAsync(user, employee.Password);
 
                 if (result.Succeeded)
                 {
@@ -63,86 +66,19 @@ namespace ProjectDashboard.Controllers
                     return RedirectToAction("Index", new { success = true, message = "Employee added successfully!" });
                 }
 
-                // Add Identity errors to ModelState
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                _context.Employees.Add(employee);
+                _context.SaveChanges();
+                return Json(new { success = true, message = "Employee added successfully!" });
             }
 
-            // If we got this far, something failed
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-            return RedirectToAction("Index", new { success = false, message = "Failed to add employee. Please check the fields.", errors });
+            var errors = ModelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+            );
+
+            return Json(new { success = false, errors });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Update(Employee employee, int id)
-        {
-            if (ModelState.IsValid)
-            {
-                var existingEmployee = await _context.Employees.FindAsync(id);
-                if (existingEmployee == null)
-                {
-                    return RedirectToAction("Index", new { success = false, message = "Employee not found!" });
-                }
 
-                // Update IdentityUser if email or password changes
-                var user = await _userManager.FindByEmailAsync(existingEmployee.Email);
-                if (user != null)
-                {
-                    if (existingEmployee.Email != employee.Email)
-                    {
-                        user.UserName = employee.Email;
-                        user.Email = employee.Email;
-                        await _userManager.UpdateAsync(user);
-                    }
-
-                    if (existingEmployee.Password != employee.Password)
-                    {
-                        var hashedPassword = _userManager.PasswordHasher.HashPassword(user, employee.Password);
-                        existingEmployee.Password = hashedPassword; // Update hashed password
-                        await _userManager.RemovePasswordAsync(user);
-                        await _userManager.AddPasswordAsync(user, employee.Password);
-                    }
-                }
-
-                // Update employee details
-                existingEmployee.Name = employee.Name;
-                existingEmployee.Cin = employee.Cin;
-                existingEmployee.Email = employee.Email;
-                existingEmployee.Role = employee.Role;
-
-                _context.Employees.Update(existingEmployee);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction("Index", new { success = true, message = "Employee updated successfully!" });
-            }
-
-            // If something failed
-            return RedirectToAction("Index", new { success = false, message = "Failed to update employee. Please check the fields." });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee == null)
-            {
-                return RedirectToAction("Index", new { success = false, message = "Employee not found!" });
-            }
-
-            // Delete IdentityUser
-            var user = await _userManager.FindByEmailAsync(employee.Email);
-            if (user != null)
-            {
-                await _userManager.DeleteAsync(user);
-            }
-
-            // Delete the employee
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Index", new { success = true, message = "Employee deleted successfully!" });
-        }
     }
 }
