@@ -219,8 +219,8 @@ namespace ProjectDashboard.Migrations
 
                     b.Property<string>("Cin")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
+                        .HasMaxLength(8)
+                        .HasColumnType("varchar(8)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -287,16 +287,10 @@ namespace ProjectDashboard.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<DateTime>("JoinedDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("RoleInProject")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Task")
                         .HasColumnType("longtext");
 
                     b.HasKey("ProjectId", "EmployeeId");

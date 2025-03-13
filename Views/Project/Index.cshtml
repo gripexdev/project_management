@@ -66,6 +66,10 @@
                                             onclick="editProject(@project.Id)"><i class="bx bx-edit-alt me-1"></i> Edit</a>
                                         <a class="dropdown-item" href="javascript:void(0);"
                                             onclick="deleteProject(@project.Id)"><i class="bx bx-trash me-1"></i> Delete</a>
+                                        <a class="dropdown-item" href="javascript:void(0);"
+                                            onclick="openAssignModal(@project.Id)">
+                                            <i class="bx bx-user-plus me-1"></i> Assign Employee
+                                        </a>
                                     </div>
                                 </div>
                             </td>
@@ -204,6 +208,40 @@
     </div>
 </div>
 
+<!-- Assign Employee Modal -->
+<div class="modal fade" id="assignEmployeeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Assign Employee to Project</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="assignEmployeeForm">
+                <input type="hidden" id="projectId" name="ProjectId" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Employee</label>
+                        <select id="employeeDropdown" name="EmployeeId" class="form-control">
+                            <!-- Employees will be populated dynamically -->
+                        </select>
+                        <span class="text-danger" id="employeeError"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role in Project</label>
+                        <input type="text" id="roleInProject" name="RoleInProject" class="form-control"
+                            placeholder="e.g., Developer, Manager" />
+                        <span class="text-danger" id="roleInProjectError"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Assign</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Toast container -->
 <div id="toastContainer" aria-live="polite" aria-atomic="true" class="position-fixed bottom-0 end-0 p-3"
     style="z-index: 1100;">
@@ -242,8 +280,8 @@
                         // Show success toast
                         @* showToast('success', data.message); *@
 
-                                            // Close the modal
-                                            var modal = bootstrap.Modal.getInstance(document.getElementById('addProjectModal'));
+                                                                                                        // Close the modal
+                                                                                                        var modal = bootstrap.Modal.getInstance(document.getElementById('addProjectModal'));
                         modal.hide();
 
                         // Wait for the toast to be visible before refreshing
@@ -389,6 +427,98 @@
                 });
         });
 
+        // Open Assign Modal and Populate Employee Dropdown with Unassigned Employees
+        function openAssignModal(projectId) {
+            document.getElementById('projectId').value = projectId;
+
+            // Clear previous dropdown options
+            const employeeDropdown = document.getElementById('employeeDropdown');
+            employeeDropdown.innerHTML = '';
+
+            // Fetch unassigned employees
+            fetch(`/Project/GetUnassignedEmployees?projectId=${projectId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        //debug
+                        console.log('Employees:', data.employees); // Debugging
+                        console.log('Employees:', data.employees[0].id); // Debugging
+                        console.log('Employees:', data.employees[0].name); // Debugging
+
+                        data.employees.forEach(employee => {
+                            console.log('Employee ID:', employee.id);
+                            console.log('Employee Name:', employee.name);
+                            const option = document.createElement('option');
+                            option.value = employee.id; // Set the value to the employee's ID
+                            option.textContent = employee.name; // Display the employee's name
+                            employeeDropdown.appendChild(option);
+                        });
+
+                        // Show the modal
+                        const assignModal = new bootstrap.Modal(document.getElementById('assignEmployeeModal'));
+                        assignModal.show();
+                    } else {
+                        showToast('error', 'Error fetching employees.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('error', 'Error fetching employees.');
+                });
+        }
+
+        // Handle Form Submission for Assigning Employee to Project
+        document.getElementById('assignEmployeeForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const projectId = parseInt(document.getElementById('projectId').value, 10);
+            const employeeId = parseInt(document.getElementById('employeeDropdown').value, 10);
+            const roleInProject = document.getElementById('roleInProject').value;
+
+            console.log('Data being sent:', { projectId, employeeId, roleInProject }); // Debugging
+
+            // Input validation
+            if (!projectId || !employeeId || !roleInProject) {
+                showToast('error', 'Please fill in all fields.');
+                return;
+            }
+
+            fetch('/Project/AssignEmployeeToProject', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    ProjectId: projectId,
+                    EmployeeId: employeeId,
+                    RoleInProject: roleInProject
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showToast('success', data.message);
+                        const assignModal = bootstrap.Modal.getInstance(document.getElementById('assignEmployeeModal'));
+                        assignModal.hide();
+                        setTimeout(() => {
+                            window.location.reload(); // Refresh the page after 1 second
+                        }, 1000);
+                    } else {
+                        showToast('error', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('error', 'Error assigning employee to project.');
+                });
+        });
+
         // Show toast message
         function showToast(type, message) {
             var toastElement = document.createElement('div');
@@ -400,15 +530,15 @@
             toastElement.setAttribute('data-bs-delay', '3000');
 
             var toastBody = `
-                                            <div class="toast-header">
-                                                <i class='bx bx-bell me-2'></i>
-                                                <strong class="me-auto">Notification</strong>
-                                                <small>Just now</small>
-                                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                            </div>
-                                            <div class="toast-body">
-                                                ${message}
-                                            </div>`;
+                                                                                                        <div class="toast-header">
+                                                                                                            <i class='bx bx-bell me-2'></i>
+                                                                                                            <strong class="me-auto">Notification</strong>
+                                                                                                            <small>Just now</small>
+                                                                                                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                                                                                        </div>
+                                                                                                        <div class="toast-body">
+                                                                                                            ${message}
+                                                                                                        </div>`;
 
             toastElement.innerHTML = toastBody;
 
