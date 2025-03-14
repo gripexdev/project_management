@@ -24,45 +24,49 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-public async Task<IActionResult> Register(Employee model)
-{
-    if (ModelState.IsValid)
+    public async Task<IActionResult> Register(Employee model)
     {
-        // Create a new IdentityUser (or Employee if using custom user class)
-        var user = new IdentityUser { UserName = model.Email, Email = model.Email };
-        var result = await _userManager.CreateAsync(user, model.Password);
-
-        if (result.Succeeded)
+        if (ModelState.IsValid)
         {
-            // Optionally, add additional fields to the Employee table
-            var employee = new Employee
+            // Create a new IdentityUser (or Employee if using custom user class)
+            var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
             {
-                Name = model.Name,
-                Cin = model.Cin,
-                Email = model.Email,
-                Password = model.Password, // Note: Store hashed password in production
-                Role = "User", // Default role
-                CreatedAt = DateTime.UtcNow
-            };
+                //assing default rolee User to the new use
+                await _userManager.AddToRoleAsync(user, "User");
 
-            // Save the employee to the database (if using a separate Employee table)
-            _context.Employees.Add(employee);
-            _context.SaveChanges();
+                // Optionally, add additional fields to the Employee table
+                var employee = new Employee
+                {
+                    Name = model.Name,
+                    Cin = model.Cin,
+                    Email = model.Email,
+                    Password = model.Password, // Note: Store hashed password in production
+                    Role = "User", // Default role
+                    CreatedAt = DateTime.UtcNow
+                };
 
-            // Sign in the user
-            await _signInManager.SignInAsync(user, isPersistent: false);
-            return RedirectToAction("Index", "Home");
+                // Save the employee to the database (if using a separate Employee table)
+                _context.Employees.Add(employee);
+                _context.SaveChanges();
+
+                // Sign in the user
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                // return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "UserHome");
+            }
+
+            // Add errors to ModelState
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
         }
 
-        // Add errors to ModelState
-        foreach (var error in result.Errors)
-        {
-            ModelState.AddModelError(string.Empty, error.Description);
-        }
+        return View(model);
     }
-
-    return View(model);
-}
 
     [HttpGet]
     public IActionResult Login()
@@ -79,7 +83,17 @@ public async Task<IActionResult> Register(Employee model)
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Index", "Home");
+                //check if user is admin or user
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                var roles = await _userManager.GetRolesAsync(user);
+                if (roles.Contains("Admin"))
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "UserHome");
+                }
             }
 
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");

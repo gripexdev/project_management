@@ -36,6 +36,37 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
+//seed roles
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    await RoleSeeder.seedRolesAsync(roleManager);
+
+    // Check if admin user exists
+    var adminEmail = "admin@admin.com";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser == null)
+    {
+        // Create admin user
+        var admin = new IdentityUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(admin, "adminadminA1");
+
+        if (result.Succeeded)
+        {
+            // Assign the Admin role to the admin user
+            await userManager.AddToRoleAsync(admin, "Admin");
+        }
+    }
+}
+
 app.UseStaticFiles();
 app.UseRouting();
 

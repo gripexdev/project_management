@@ -6,7 +6,7 @@ using ProjectDashboard.Models;
 
 namespace ProjectDashboard.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class EmployeeController : Controller
     {
         private readonly AppDbContext _context;

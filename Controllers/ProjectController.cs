@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization; // Required for Skip and Take methods
 
 namespace ProjectDashboard.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class ProjectController : Controller
     {
         private readonly ILogger<ProjectController> _logger;
@@ -33,7 +33,7 @@ namespace ProjectDashboard.Controllers
                 .Take(pageSize)
                 .ToList();
 
-            // Create a ViewModel to pass data to the view 
+            // Create a ViewModel to pass data to the view
             var model = new ProjectIndexViewModel
             {
                 Projects = projects,
@@ -45,7 +45,7 @@ namespace ProjectDashboard.Controllers
             return View(model);
         }
 
-        // Add Project 
+        // Add Project
         [HttpPost]
         public IActionResult Add(Project project)
         {
@@ -189,7 +189,7 @@ namespace ProjectDashboard.Controllers
                 return Json(new { success = false, message = "Error fetching unassigned employees." });
             }
         }
-        
+
         // Assign Employee to Project with Role
         [HttpPost]
         public IActionResult AssignEmployeeToProject([FromBody] AssignEmployeeViewModel model)
