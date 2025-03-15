@@ -1,0 +1,39 @@
+@model ProjectDashboard.Models.ProjectDetailsViewModel
+
+<h2>Project Details</h2>
+
+<div>
+    <h4>@Model.Name</h4>
+    <p><strong>Description:</strong> @Model.Description</p>
+    <p><strong>Status:</strong> @Model.Status</p>
+    <p><strong>Start Date:</strong> @Model.StartDate.ToShortDateString()</p>
+    <p><strong>End Date:</strong> @Model.EndDate.ToShortDateString()</p>
+</div>
+
+<h3>Assigned Employees</h3>
+@if (Model.AssignedEmployees.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Role in Project</th>
+                <th>Joined Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var employee in Model.AssignedEmployees)
+            {
+                <tr>
+                    <td>@employee.Name</td>
+                    <td>@employee.RoleInProject</td>
+                    <td>@employee.JoinedDate.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No employees are assigned to this project.</p>
+}
