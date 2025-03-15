@@ -31,5 +31,7 @@ namespace ProjectDashboard.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<ProjectEmployee> ProjectEmployees { get; set; } = new List<ProjectEmployee>();
+
+        public ICollection<Task> Tasks { get; set; } = new List<Task>();
     }
 }

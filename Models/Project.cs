@@ -20,6 +20,8 @@ namespace ProjectDashboard.Models
         public ProjectStatus Status { get; set; } = ProjectStatus.Pending;
 
         public ICollection<ProjectEmployee> ProjectEmployees { get; set; } = new List<ProjectEmployee>();
+
+        public ICollection<Task> Tasks { get; set; } = new List<Task>();
     }
 
     public enum ProjectStatus
