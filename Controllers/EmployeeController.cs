@@ -62,6 +62,9 @@ namespace ProjectDashboard.Controllers
                 // Assign role to the user
                 // await _userManager.AddToRoleAsync(user, employee.Role);
 
+                //assing default rolee User to the new use
+                await _userManager.AddToRoleAsync(user, "User");
+
                 // Save the employee to the database
                 await _context.Employees.AddAsync(employee);
                 await _context.SaveChangesAsync();
@@ -164,6 +167,15 @@ namespace ProjectDashboard.Controllers
                         await _userManager.UpdateAsync(user);
                         // Assign role to the user
                         // await _userManager.AddToRoleAsync(user, employee.Role);
+
+                        //assing default rolee User to the new use
+                        // Remove the old roles
+                        var currentRoles = await _userManager.GetRolesAsync(user);
+                        foreach (var role in currentRoles)
+                        {
+                            await _userManager.RemoveFromRoleAsync(user, role);
+                        }
+                        await _userManager.AddToRoleAsync(user, employee.Role);
                     }
                     else
                     {

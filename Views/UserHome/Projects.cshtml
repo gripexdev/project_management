@@ -1,0 +1,6 @@
+@model ProjectDashboard.Models.UserHomeViewModel
+
+@foreach (var project in Model.employee.ProjectEmployees)
+{
+    <p>@project.Project.Name</p>
+}
