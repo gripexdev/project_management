@@ -37,7 +37,8 @@ namespace ProjectDashboard.Controllers
 
             // Find the employee with the same email
             var employee = await _context.Employees
-                .Include(e => e.ProjectEmployees) // Explicitly include the ProjectEmployees collection
+                .Include(e => e.Tasks) // Include tasks assigned to the employee
+                .Include(e => e.ProjectEmployees).ThenInclude(pe => pe.Project) // Include projects assigned to the employee
                 .FirstOrDefaultAsync(e => e.Email == userEmail);
             if (employee == null)
             {
@@ -51,6 +52,41 @@ namespace ProjectDashboard.Controllers
                 userHomeViewModel.totalProjectsAssigned = employee.ProjectEmployees.Count();
                 userHomeViewModel.totalTasksAssigned = employee.Tasks.ToList().Count();
             }
+
+            // Prepare events for the calendar
+            var events = new List<object>();
+
+            // Add task deadlines
+            foreach (var task in employee.Tasks)
+            {
+                if (task.EndDate.HasValue)
+                {
+                    events.Add(new
+                    {
+                        title = $"Task: {task.TaskName}",
+                        start = task.EndDate.Value.ToString("yyyy-MM-dd"),
+                        color = "#FF5733" // Red for tasks
+                    });
+                }
+            }
+
+            // Add project end dates
+            foreach (var projectEmployee in employee.ProjectEmployees)
+            {
+                if (projectEmployee.Project.EndDate != default(DateTime))
+                {
+                    events.Add(new
+                    {
+                        title = $"Project: {projectEmployee.Project.Name}",
+                        start = projectEmployee.Project.EndDate.ToString("yyyy-MM-dd"),
+                        color = "#3498DB" // Blue for projects
+                    });
+                }
+            }
+
+            // Pass data to the view
+            userHomeViewModel.employee = employee;
+            userHomeViewModel.calendarEvents = events;
 
             // Pass the employee data to the view
             return View(userHomeViewModel);

@@ -11,5 +11,6 @@ namespace ProjectDashboard.Models
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }
         public int PageSize { get; set; }
+        public List<object>? calendarEvents { get; set; } // For FullCalendar events
     }
 }
