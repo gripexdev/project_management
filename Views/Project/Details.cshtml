@@ -1,5 +1,9 @@
 @model ProjectDashboard.Models.ProjectDetailsViewModel
 
+@{
+    ViewData["Title"] = "Project Details Page";
+}
+
 <h2>Project Details</h2>
 
 <div>
@@ -19,6 +23,7 @@
                 <th>Name</th>
                 <th>Role in Project</th>
                 <th>Joined Date</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -28,6 +33,13 @@
                     <td>@employee.Name</td>
                     <td>@employee.RoleInProject</td>
                     <td>@employee.JoinedDate.ToShortDateString()</td>
+                    <td>
+                        <!-- Button to open the modal -->
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskModal"
+                            onclick="openCreateTaskModal(@Model.Id, @employee.Id)">
+                            Assign Task
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -36,4 +48,180 @@
 else
 {
     <p>No employees are assigned to this project.</p>
+}
+
+<!-- Toast Container -->
+<div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11"></div>
+
+<!-- Modal for Creating a Task -->
+<div class="modal fade" id="createTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="createTaskForm">
+                <input type="hidden" id="projectId" name="ProjectId" />
+                <input type="hidden" id="employeeId" name="EmployeeId" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Task Name</label>
+                        <input type="text" id="taskName" name="TaskName" class="form-control" />
+                        <span id="taskNameError" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Task Description</label>
+                        <textarea id="taskDescription" name="TaskDescription" class="form-control"></textarea>
+                        <span id="taskDescriptionError" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" id="startDate" name="StartDate" class="form-control" />
+                        <span id="startDateError" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">End Date</label>
+                        <input type="date" id="endDate" name="EndDate" class="form-control" />
+                        <span id="endDateError" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section PageScripts {
+    <script>
+
+        // Open the modal to create a task
+        function openCreateTaskModal(projectId, employeeId) {
+            // Clear form fields and errors
+            document.getElementById('projectId').value = projectId;
+            document.getElementById('employeeId').value = employeeId;
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskDescription').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            clearValidationErrors();
+        }
+
+        function clearValidationErrors() {
+            document.getElementById('taskNameError').innerText = '';
+            document.getElementById('taskDescriptionError').innerText = '';
+            document.getElementById('startDateError').innerText = '';
+            document.getElementById('endDateError').innerText = '';
+        }
+
+        // TODO: add prioriy to the task creation form
+        // Handle form submission for adding a task
+        document.getElementById('createTaskForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Clear previous errors
+            clearValidationErrors();
+
+            // Get form data
+            const projectId = document.getElementById('projectId').value;
+            const employeeId = document.getElementById('employeeId').value;
+            const taskName = document.getElementById('taskName').value;
+            const taskDescription = document.getElementById('taskDescription').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            // Validate input
+            let isValid = true;
+            if (!taskName) {
+                document.getElementById('taskNameError').innerText = 'Task name is required.';
+                isValid = false;
+            }
+            if (!taskDescription) {
+                document.getElementById('taskDescriptionError').innerText = 'Task description is required.';
+                isValid = false;
+            }
+            if (!startDate) {
+                document.getElementById('startDateError').innerText = 'Start date is required.';
+                isValid = false;
+            }
+            if (!endDate) {
+                document.getElementById('endDateError').innerText = 'End date is required.';
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            // Send request to create task
+            fetch('/Project/CreateTask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    ProjectId: parseInt(projectId),
+                    EmployeeId: parseInt(employeeId),
+                    TaskName: taskName,
+                    TaskDescription: taskDescription,
+                    StartDate: startDate,
+                    EndDate: endDate
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showToast('success', 'Task created successfully!');
+                        const createTaskModal = bootstrap.Modal.getInstance(document.getElementById('createTaskModal'));
+                        createTaskModal.hide();
+                        setTimeout(() => {
+                            window.location.reload(); // Refresh page after 1 second
+                        }, 1000);
+                    } else {
+                        showToast('danger', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('danger', 'Error creating task.');
+                });
+        });
+
+        // Show toast message
+        function showToast(type, message) {
+            var toastElement = document.createElement('div');
+            toastElement.className = `toast align-items-center text-white ${type === 'error' ? 'bg-danger' : 'bg-success'} border-0 m-2`;
+            toastElement.setAttribute('role', 'alert');
+            toastElement.setAttribute('aria-live', 'assertive');
+            toastElement.setAttribute('aria-atomic', 'true');
+            toastElement.setAttribute('data-bs-autohide', 'true');
+            toastElement.setAttribute('data-bs-delay', '3000');
+
+            var toastBody = `
+                            <div class="toast-header">
+                                <i class='bx bx-bell me-2'></i>
+                                <strong class="me-auto">Notification</strong>
+                                <small>Just now</small>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                ${message}
+                            </div>`;
+
+            toastElement.innerHTML = toastBody;
+
+            var toastContainer = document.getElementById('toastContainer');
+            toastContainer.appendChild(toastElement);
+
+            var toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+    </script>
 }

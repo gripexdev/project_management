@@ -302,8 +302,53 @@ namespace ProjectDashboard.Controllers
             }
         }
 
+        // assign task to employee
+        [HttpPost]
+        public IActionResult CreateTask([FromBody] Models.Task task)
+        {
+            try
+            {
+                // Validate input
+                if (task == null || task.ProjectId <= 0 || task.EmployeeId <= 0)
+                {
+                    return Json(new { success = false, message = "Invalid project or employee ID." });
+                }
+
+                if (string.IsNullOrWhiteSpace(task.TaskName))
+                {
+                    return Json(new { success = false, message = "Task name is required." });
+                }
+
+                if (string.IsNullOrWhiteSpace(task.TaskDescription))
+                {
+                    return Json(new { success = false, message = "Task description is required." });
+                }
+
+                // Check if project and employee exist
+                var project = _context.Projects.Find(task.ProjectId);
+                var employee = _context.Employees.Find(task.EmployeeId);
+
+                if (project == null)
+                {
+                    return Json(new { success = false, message = $"Project with ID {task.ProjectId} not found." });
+                }
+
+                if (employee == null)
+                {
+                    return Json(new { success = false, message = $"Employee with ID {task.EmployeeId} not found." });
+                }
+
+                // Add the task to the database
+                _context.Tasks.Add(task);
+                _context.SaveChanges();
+
+                return Json(new { success = true, message = "Task created successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error creating task: {ex.Message}" });
+            }
+        }
         // TODO: Implement Unassign Employee from Project action
-
-
     }
 }
