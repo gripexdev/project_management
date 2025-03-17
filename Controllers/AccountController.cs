@@ -108,4 +108,18 @@ public class AccountController : Controller
         await _signInManager.SignOutAsync();
         return RedirectToAction("Index", "Home");
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Profile()
+    {
+        return View();
+    }
+
+
+    [HttpGet]
+    public async Task<IActionResult> AccessDenied()
+    {
+        await _signInManager.SignOutAsync();
+        return RedirectToAction("Login", "Account");
+    }
 }

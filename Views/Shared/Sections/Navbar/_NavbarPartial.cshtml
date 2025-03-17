@@ -1,14 +1,14 @@
 @* ! Brand demo (display only for navbar-full and hide on below xl) *@
 @if (ViewData["navbarFull"] != null)
 {
-<div class="navbar-brand app-brand demo d-none d-xl-flex py-0 me-4">
-  <a asp-controller="Dashboards" asp-action="Index" class="app-brand-link gap-2">
+  <div class="navbar-brand app-brand demo d-none d-xl-flex py-0 me-4">
+    <a asp-controller="Dashboards" asp-action="Index" class="app-brand-link gap-2">
       <span class="app-brand-logo demo">
         @await Html.PartialAsync("../_Partials/_Macros")
       </span>
       <span class="app-brand-text demo menu-text fw-bold">@TempData.Peek("appName")</span>
     </a>
-</div>
+  </div>
 }
 
 @* ! Not required for layout-without-menu *@
@@ -26,18 +26,14 @@
   <!-- Search -->
   <div class="navbar-nav align-items-center">
     <div class="nav-item d-flex align-items-center">
-        <i class="bx bx-search bx-md"></i>
-      <input type="text" class="form-control border-0 shadow-none ps-1 ps-sm-2" placeholder="Search..." aria-label="Search...">
+      <i class="bx bx-search bx-md"></i>
+      <input type="text" class="form-control border-0 shadow-none ps-1 ps-sm-2" placeholder="Search..."
+        aria-label="Search...">
     </div>
   </div>
   <!-- /Search -->
 
   <ul class="navbar-nav flex-row align-items-center ms-auto">
-    <!-- Place this tag where you want the button to render. -->
-    <li class="nav-item lh-1 me-4">
-      <a class="github-button" href="https://github.com/themeselection/sneat-bootstrap-html-aspnet-core-mvc-admin-template-free" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star themeselection/sneat-html-admin-template-free on GitHub">Star</a>
-    </li>
-
     <!-- User -->
     <li class="nav-item navbar-dropdown dropdown-user dropdown">
       <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -54,9 +50,8 @@
                   <img src="~/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle">
                 </div>
               </div>
-              <div class="flex-grow-1">
-                <h6 class="mb-0">John Doe</h6>
-                <small class="text-muted">Admin</small>
+              <div class="">
+                <h6 class="mt-2">@User.Identity.Name</h6>
               </div>
             </div>
           </a>
@@ -65,24 +60,9 @@
           <div class="dropdown-divider my-1"></div>
         </li>
         <li>
-          <a class="dropdown-item" href="javascript:void(0);">
+          <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
             <i class="bx bx-user bx-md me-2"></i>
             <span>My Profile</span>
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item" href="javascript:void(0);">
-            <i class="bx bx-cog bx-md me-2"></i>
-            <span>Settings</span>
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item" href="javascript:void(0);">
-            <span class="d-flex align-items-center align-middle">
-              <i class="flex-shrink-0 bx bx-credit-card bx-md me-3"></i>
-              <span class="flex-grow-1 align-middle">Billing Plan</span>
-              <span class="flex-shrink-0 badge rounded-pill bg-danger">4</span>
-            </span>
           </a>
         </li>
         <li>
@@ -97,7 +77,7 @@
             </a>
           </li>
         }
-        
+
       </ul>
     </li>
     <!--/ User -->
