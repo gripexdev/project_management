@@ -1,6 +1,206 @@
 @model ProjectDashboard.Models.UserHomeViewModel
 
-@foreach (var project in Model.employee.ProjectEmployees)
-{
-    <p>@project.Project.Name</p>
+@{
+  ViewData["Title"] = "User Projects Page";
+  ViewData["navbarHideToggle"] = true;
+  ViewData["isMenu"] = false;
+  ViewData["menuFixed"] = "";
+}
+@* ************** Content ************** *@
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">My Projects</h5>
+        <!-- Button trigger modal -->
+        <a class="btn btn-primary" asp-controller="UserHome" asp-action="Index">
+            Home
+        </a>
+    </div>
+
+    <div class="table-responsive text-nowrap">
+        @if (Model.projects == null || !Model.projects.Any())
+        {
+            <p style="text-align: center;">No projects at the moment.</p>
+        }
+        else
+        {
+            <table class="table">
+                <thead class="table-light">
+                    <tr>
+                        <th>Project Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Total Tasks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-border-bottom-0">
+                    @foreach (var project in Model.projects)
+                    {
+                        <tr>
+                            <td>@project.Name</td>
+                            <td>@project.StartDate.ToString("yyyy-MM-dd")</td>
+                            <td>@project.EndDate.ToString("yyyy-MM-dd")</td>
+                            <td><span class="badge bg-label-primary me-1">@project.Status</span></td>
+                            <td>@project.Tasks.Count()</td>
+                            <td>
+                                <div class="dropdown">
+                                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
+                                        data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal"
+                                            data-bs-target="#editEmployeeModal_@project.Id">
+                                            <i class="bx bx-edit-alt me-1"></i> View Tasks
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Edit Employee Modal -->
+                        @* <div class="modal fade" id="editEmployeeModal_@employee.Id" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Edit Employee</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="post" asp-action="Update" asp-asp-controller="Employee">
+                                        <input type="hidden" name="Id" value="@employee.Id" />
+                                        <input type="hidden" name="Password" value="@employee.Password" />
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Name</label>
+                                                <input type="text" id="name" name="Name" value="@employee.Name"
+                                                    class="form-control">
+                                                <span class="text-danger" id="nameError"></span>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Cin</label>
+                                                <input type="text" id="Cin" name="Cin" value="@employee.Cin"
+                                                    class="form-control">
+                                                <span class="text-danger" id="CinError"></span>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Email</label>
+                                                <input type="email" id="Email" name="Email" value="@employee.Email"
+                                                    class="form-control">
+                                                <span class="text-danger" id="EmailError"></span>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Role</label>
+                                                <select name="Role" id="Role" class="form-select">
+                                                    <option value="User"
+                                                        selected="@(employee.Role == "User" ? "selected" : null)">User</option>
+                                                    <option value="Admin"
+                                                        selected="@(employee.Role == "Admin" ? "selected" : null)">Admin
+                                                    </option>
+                                                </select>
+                                                <span class="text-danger" id="RoleError"></span>
+                                            </div>
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div> *@
+
+                    }
+
+                </tbody>
+            </table>
+
+            <div class="d-flex justify-content-center">
+                <ul class="pagination">
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                                href="@Url.Action("Index", new { page = Model.CurrentPage - 1, pageSize = Model.PageSize })">Previous</a>
+                        </li>
+                    }
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = i, pageSize = Model.PageSize })">@i</a>
+                        </li>
+                    }
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                                href="@Url.Action("Index", new { page = Model.CurrentPage + 1, pageSize = Model.PageSize })">Next</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+<!-- Toast container -->
+<div id="toastContainer" aria-live="polite" aria-atomic="true" class="position-fixed bottom-0 end-0 p-3"
+    style="z-index: 1100;">
+</div>
+
+
+
+@* TODO: put js code in a separate file *@
+@section PageScripts {
+    <script src="~/js/ui-toasts.js"></script>
+    <script>
+        function showToast(type, message) {
+            var toastElement = document.createElement('div');
+            toastElement.className = `toast align-items-center text-white ${type === 'error' ? 'bg-danger' : 'bg-success'} border-0 m-2`;
+            toastElement.setAttribute('role', 'alert');
+            toastElement.setAttribute('aria-live', 'assertive');
+            toastElement.setAttribute('aria-atomic', 'true');
+            toastElement.setAttribute('data-bs-autohide', 'true');
+            toastElement.setAttribute('data-bs-delay', '3000');
+
+            var toastBody = `
+                                                <div class="toast-header">
+                                                    <i class='bx bx-bell me-2'></i>
+                                                    <strong class="me-auto">Notification</strong>
+                                                    <small>Just now</small>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                                </div>
+                                                <div class="toast-body">
+                                                    ${message}
+                                                </div>`;
+
+            toastElement.innerHTML = toastBody;
+
+            var toastContainer = document.getElementById('toastContainer');
+            toastContainer.appendChild(toastElement);
+
+            var toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+
+        // Check if TempData has any message to show
+        @if (TempData["Success"] != null)
+            {
+                <text>
+                    showToast('success', '@TempData["Success"]');
+                                                                            @TempData.Remove("Success");
+                </text>
+        }
+
+            @if (TempData["Error"] != null)
+            {
+                <text>
+                    showToast('error', '@TempData["Error"]');
+                                                                            @TempData.Remove("Error");
+                </text>
+        }
+    </script>
+
 }

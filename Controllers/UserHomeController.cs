@@ -49,6 +49,7 @@ namespace ProjectDashboard.Controllers
             {
                 userHomeViewModel.employee = employee;
                 userHomeViewModel.totalProjectsAssigned = employee.ProjectEmployees.Count();
+                userHomeViewModel.totalTasksAssigned = employee.Tasks.ToList().Count();
             }
 
             // Pass the employee data to the view
@@ -57,9 +58,10 @@ namespace ProjectDashboard.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Projects()
+        public async Task<IActionResult> Projects(int page = 1, int pageSize = 10)
         {
             UserHomeViewModel userHomeViewModel = new UserHomeViewModel();
+
             // Get the currently authenticated user
             var user = await _userManager.GetUserAsync(HttpContext.User);
             if (user == null)
@@ -79,15 +81,30 @@ namespace ProjectDashboard.Controllers
                 TempData["Error"] = "No employee record found for the current user.";
                 return RedirectToAction("Index", "UserHome");
             }
-            else
-            {
-                userHomeViewModel.employee = employee;
-                // userHomeViewModel.totalProjectsAssigned = employee.ProjectEmployees.Count();
-                // userHomeViewModel.projects = employee.ProjectEmployees?.
-                //                     Select(pe => pe.Project).ToList();
+            // Query ProjectEmployees directly for the authenticated employee
+            var projectEmployees = await _context.ProjectEmployees
+                .Include(pe => pe.Project) // Include the related Project
+                .Where(pe => pe.EmployeeId == employee.Id) // Filter by EmployeeId
+                .ToListAsync();
 
-                return View(userHomeViewModel);
-            }
+            // Assign data to the ViewModel
+            userHomeViewModel.employee = employee;
+            userHomeViewModel.totalProjectsAssigned = projectEmployees.Count;
+
+            // Extract the Project objects from the ProjectEmployees
+            userHomeViewModel.projects = projectEmployees
+                .Where(pe => pe.Project != null) // Ensure Project is not null
+                .Select(pe => pe.Project)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // assign the current page, total pages and page size to the view model to implement pagination
+            userHomeViewModel.CurrentPage = page;
+            userHomeViewModel.TotalPages = (int)Math.Ceiling(projectEmployees.Count / (double)pageSize);
+            userHomeViewModel.PageSize = pageSize;
+
+            return View(userHomeViewModel);
 
         }
     }
