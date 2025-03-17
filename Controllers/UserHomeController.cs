@@ -88,6 +88,14 @@ namespace ProjectDashboard.Controllers
             userHomeViewModel.employee = employee;
             userHomeViewModel.calendarEvents = events;
 
+
+            // pass data for stats
+            userHomeViewModel.completedTasksCount = employee.Tasks.Count(t => t.Status == Models.TaskStatus.Completed);
+            userHomeViewModel.pendingTasksCount = employee.Tasks.Count(t => t.Status == Models.TaskStatus.InProgress);
+            userHomeViewModel.overdueTasksCount = employee.Tasks.Count(t => t.EndDate < DateTime.UtcNow && t.Status != Models.TaskStatus.Completed);
+            userHomeViewModel.activeProjectsCount = employee.ProjectEmployees.Count(pe => pe.Project.Status == ProjectStatus.InProgress);
+            userHomeViewModel.completedProjectsCount = employee.ProjectEmployees.Count(pe => pe.Project.Status == ProjectStatus.Completed);
+
             // Pass the employee data to the view
             return View(userHomeViewModel);
         }

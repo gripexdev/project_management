@@ -135,8 +135,8 @@
                                             <div
                                                 class="d-flex justify-content-between align-items-center border-end pb-4 pb-sm-0 card-widget-3">
                                                 <div>
-                                                    <h4 class="mb-0">$2.46k</h4>
-                                                    <p class="mb-0">Paid</p>
+                                                    <h4 class="mb-0">@Model.completedTasksCount</h4>
+                                                    <p class="mb-0">Tasks Completed</p>
                                                 </div>
                                                 <div class="avatar me-sm-6">
                                                     <span
@@ -149,8 +149,8 @@
                                         <div class="col-sm-6 col-lg-3">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <div>
-                                                    <h4 class="mb-0">$876</h4>
-                                                    <p class="mb-0">Unpaid</p>
+                                                    <h4 class="mb-0">@Model.pendingTasksCount</h4>
+                                                    <p class="mb-0">Tasks In Progress</p>
                                                 </div>
                                                 <div class="avatar">
                                                     <span
@@ -166,90 +166,7 @@
                         </div>
                     </div>
                     <!-- /single card  -->
-                    <div class="col-lg-3 col-sm-6 mb-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div class="card-info">
-                                        <p class="text-heading mb-1">Session</p>
-                                        <div class="d-flex align-items-center mb-1">
-                                            <h4 class="card-title mb-0 me-2">58,352</h4>
-                                            <span class="text-success">(+29%)</span>
-                                        </div>
-                                        <span>Last Week Analytics</span>
-                                    </div>
-                                    <div class="card-icon">
-                                        <span class="badge bg-label-primary rounded p-2">
-                                            <i class='bx bx-trending-up bx-lg'></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 mb-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div class="card-info">
-                                        <p class="text-heading mb-1">Time On Site</p>
-                                        <div class="d-flex align-items-center mb-1">
-                                            <h4 class="card-title mb-0 me-2">28m 14s</h4>
-                                            <span class="text-success">(+18%)</span>
-                                        </div>
-                                        <span>Last Day Analytics</span>
-                                    </div>
-                                    <div class="card-icon">
-                                        <span class="badge bg-label-info rounded p-2">
-                                            <i class='bx bx-time-five bx-lg'></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 mb-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div class="card-info">
-                                        <p class="text-heading mb-1">Bounce Rate</p>
-                                        <div class="d-flex align-items-center mb-1">
-                                            <h4 class="card-title mb-0 me-2">62%</h4>
-                                            <span class="text-danger">(-14%)</span>
-                                        </div>
-                                        <span>Last Week Analytics</span>
-                                    </div>
-                                    <div class="card-icon">
-                                        <span class="badge bg-label-danger rounded p-2">
-                                            <i class='bx bx-pie-chart-alt bx-lg'></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 mb-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div class="card-info">
-                                        <p class="text-heading mb-1">Users</p>
-                                        <div class="d-flex align-items-center mb-1">
-                                            <h4 class="card-title mb-0 me-2">18,472</h4>
-                                            <span class="text-success">(+42%)</span>
-                                        </div>
-                                        <span>Last Year Analytics</span>
-                                    </div>
-                                    <div class="card-icon">
-                                        <span class="badge bg-label-success rounded p-2">
-                                            <i class='bx bx-user bx-lg'></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
                 <!--/ Cards with few info -->
 
@@ -259,116 +176,44 @@
                     <div class="col-lg-3 col-md-6 col-sm-6 mb-6">
                         <div class="card">
                             <div class="card-header d-flex align-items-center justify-content-between">
-                                <h6 class="card-title fw-normal m-0 me-2">Total Sales</h6>
-                                <div class="dropdown">
-                                    <button class="btn btn-text text-muted p-0" type="button" id="totalSalesList"
-                                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Today <i class="bx bx-chevron-down"></i>
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="totalSalesList">
-                                        <a class="dropdown-item" href="javascript:void(0);">Yesterday</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Last Week</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
-                                    </div>
-                                </div>
+                                <h6 class="card-title fw-normal m-0 me-2">Completed Projects</h6>
                             </div>
                             <div class="card-body text-center">
-                                <div class="d-flex justify-content-center mb-3">
-                                    <div class="avatar avatar-md flex-shrink-0">
-                                        <span class="avatar-initial avatar-shadow-primary rounded-circle"><i
-                                                class='bx bx-trending-up bx-26px'></i></span>
-                                    </div>
-                                </div>
-                                <h4 class="card-title mb-0">8,352</h4>
-                                <p class="mb-2">12% of target</p>
-                                <span class="text-success">+29% <i class='bx bx-chevron-up bx-lg'></i></span>
+                                <h4 class="card-title mb-0">@Model.completedProjectsCount</h4>
+                                <p class="mb-2">Out of @Model.totalProjectsAssigned</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 col-sm-6 mb-6">
                         <div class="card">
                             <div class="card-header d-flex align-items-center justify-content-between">
-                                <h6 class="card-title fw-normal m-0 me-2">Referral Income</h6>
-                                <div class="dropdown">
-                                    <button class="btn btn-text text-muted p-0" type="button" id="referralsList"
-                                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Today <i class="bx bx-chevron-down"></i>
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="referralsList">
-                                        <a class="dropdown-item" href="javascript:void(0);">Yesterday</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Last Week</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
-                                    </div>
-                                </div>
+                                <h6 class="card-title fw-normal m-0 me-2">Overdue Tasks</h6>
                             </div>
                             <div class="card-body text-center">
-                                <div class="d-flex justify-content-center mb-3">
-                                    <div class="avatar avatar-md flex-shrink-0">
-                                        <span class="avatar-initial avatar-shadow-info rounded-circle"><i
-                                                class='bx bx-dollar bx-26px'></i></span>
-                                    </div>
-                                </div>
-                                <h4 class="card-title mb-0">$1,271</h4>
-                                <p class="mb-2">34% of target</p>
-                                <span class="text-danger">-23% <i class='bx bx-chevron-down bx-lg'></i></span>
+                                <h4 class="card-title mb-0">@Model.overdueTasksCount</h4>
+                                <p class="mb-2">Out of @Model.totalTasksAssigned</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 col-sm-6 mb-6">
                         <div class="card">
                             <div class="card-header d-flex align-items-center justify-content-between">
-                                <h6 class="card-title fw-normal m-0 me-2">Customers</h6>
-                                <div class="dropdown">
-                                    <button class="btn btn-text text-muted p-0" type="button" id="customersList"
-                                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Today <i class="bx bx-chevron-down"></i>
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="customersList">
-                                        <a class="dropdown-item" href="javascript:void(0);">Yesterday</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Last Week</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
-                                    </div>
-                                </div>
+                                <h6 class="card-title fw-normal m-0 me-2">Project in Progress</h6>
                             </div>
                             <div class="card-body text-center">
-                                <div class="d-flex justify-content-center mb-3">
-                                    <div class="avatar avatar-md flex-shrink-0">
-                                        <span class="avatar-initial avatar-shadow-success rounded-circle"><i
-                                                class='bx bx-user bx-26px'></i></span>
-                                    </div>
-                                </div>
-                                <h4 class="card-title mb-0">24,680</h4>
-                                <p class="mb-2">29% of target</p>
-                                <span class="text-success">+42% <i class='bx bx-chevron-up bx-lg'></i></span>
+                                <h4 class="card-title mb-0">--</h4>
+                                <p class="mb-2">Out of --</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 col-sm-6 mb-6">
                         <div class="card">
                             <div class="card-header d-flex align-items-center justify-content-between">
-                                <h6 class="card-title fw-normal m-0 me-2">Orders Received</h6>
-                                <div class="dropdown">
-                                    <button class="btn btn-text text-muted p-0" type="button" id="orderReceivedList"
-                                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Today <i class="bx bx-chevron-down"></i>
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="orderReceivedList">
-                                        <a class="dropdown-item" href="javascript:void(0);">Yesterday</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Last Week</a>
-                                        <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
-                                    </div>
-                                </div>
+                                <h6 class="card-title fw-normal m-0 me-2">Tasks in Progress</h6>
                             </div>
                             <div class="card-body text-center">
-                                <div class="d-flex justify-content-center mb-3">
-                                    <div class="avatar avatar-md flex-shrink-0">
-                                        <span class="avatar-initial avatar-shadow-warning rounded-circle"><i
-                                                class='bx bx-archive bx-26px'></i></span>
-                                    </div>
-                                </div>
-                                <h4 class="card-title mb-0">1,862</h4>
-                                <p class="mb-2">47% of target</p>
-                                <span class="text-success">+82% <i class='bx bx-chevron-up bx-lg'></i></span>
+                                <h4 class="card-title mb-0">--</h4>
+                                <p class="mb-2">Out of --</p>
                             </div>
                         </div>
                     </div>
@@ -398,7 +243,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                                                        @* plugins : ['dayGrid', 'timeGrid', 'list'], *@
+                                                                                @* plugins : ['dayGrid', 'timeGrid', 'list'], *@
                 initialView: 'dayGridMonth',
                 height: 'auto',
                 contentHeight: 'auto',
@@ -418,9 +263,9 @@
                 eventColor: '#378006', // Default event color (green)
                 eventTextColor: '#fff', // White text for better contrast
 
-                                                    });
+                                                                            });
         calendar.render();
-                                                });
+                                                                        });
 
 
     </script>
