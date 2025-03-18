@@ -39,6 +39,11 @@
                             onclick="openCreateTaskModal(@Model.Id, @employee.Id)">
                             Assign Task
                         </button>
+
+                        <!-- Button to unassign the employee -->
+                        <button type="button" class="btn btn-danger" onclick="unassignEmployee(@Model.Id, @employee.Id)">
+                            Unassign
+                        </button>
                     </td>
                 </tr>
             }
@@ -194,6 +199,40 @@ else
                 });
         });
 
+        // Unassign an employee from the project
+        function unassignEmployee(projectId, employeeId) {
+            if (!confirm("Are you sure you want to unassign this employee and delete all related tasks?")) {
+                return;
+            }
+
+            fetch('/Project/UnassignEmployeeFromProject', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    projectId: parseInt(projectId),
+                    employeeId: parseInt(employeeId)
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('success', data.message);
+                        setTimeout(() => {
+                            window.location.reload(); // Refresh page after 1 second
+                        }, 1000);
+                    } else {
+                        showToast('error', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('error', 'Error unassigning employee.');
+                });
+        }
+
         // Show toast message
         function showToast(type, message) {
             var toastElement = document.createElement('div');
@@ -205,15 +244,15 @@ else
             toastElement.setAttribute('data-bs-delay', '3000');
 
             var toastBody = `
-                            <div class="toast-header">
-                                <i class='bx bx-bell me-2'></i>
-                                <strong class="me-auto">Notification</strong>
-                                <small>Just now</small>
-                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                            </div>
-                            <div class="toast-body">
-                                ${message}
-                            </div>`;
+                                                <div class="toast-header">
+                                                    <i class='bx bx-bell me-2'></i>
+                                                    <strong class="me-auto">Notification</strong>
+                                                    <small>Just now</small>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                                </div>
+                                                <div class="toast-body">
+                                                    ${message}
+                                                </div>`;
 
             toastElement.innerHTML = toastBody;
 

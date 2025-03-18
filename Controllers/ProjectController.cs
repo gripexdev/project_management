@@ -349,6 +349,46 @@ namespace ProjectDashboard.Controllers
                 return Json(new { success = false, message = $"Error creating task: {ex.Message}" });
             }
         }
-        // TODO: Implement Unassign Employee from Project action
+
+        // Unassign Employee from Project and Delete Related Tasks
+        [HttpPost]
+        public IActionResult UnassignEmployeeFromProject([FromBody] UnassignEmployeeViewModel model)
+        {
+            try
+            {
+                // Validate input
+                if (model == null || model.ProjectId <= 0 || model.EmployeeId <= 0)
+                {
+                    return Json(new { success = false, message = "Invalid input: projectId or employeeId is missing or invalid." });
+                }
+
+                // Check if the employee is assigned to the project
+                var projectEmployee = _context.ProjectEmployees
+                    .FirstOrDefault(pe => pe.ProjectId == model.ProjectId && pe.EmployeeId == model.EmployeeId);
+
+                if (projectEmployee == null)
+                {
+                    return Json(new { success = false, message = "Employee is not assigned to this project." });
+                }
+
+                // Delete all tasks related to the employee in this project
+                var tasksToDelete = _context.Tasks
+                    .Where(t => t.ProjectId == model.ProjectId && t.EmployeeId == model.EmployeeId)
+                    .ToList();
+
+                _context.Tasks.RemoveRange(tasksToDelete);
+
+                // Remove the employee from the project
+                _context.ProjectEmployees.Remove(projectEmployee);
+                _context.SaveChanges();
+
+                return Json(new { success = true, message = "Employee unassigned successfully and related tasks deleted." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error unassigning employee from project.");
+                return Json(new { success = false, message = $"Error unassigning employee: {ex.Message}" });
+            }
+        }
     }
 }
