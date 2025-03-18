@@ -151,5 +151,11 @@ namespace ProjectDashboard.Controllers
             return View(userHomeViewModel);
 
         }
+
+
+        [HttpGet]
+        public IActionResult Kanban(){
+            return View();
+        }
     }
 }

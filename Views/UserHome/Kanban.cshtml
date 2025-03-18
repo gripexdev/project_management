@@ -1,0 +1,370 @@
+@{
+    ViewData["Title"] = "Kanban";
+    Layout = "_BlankLayout";
+}
+@* ************** Content ************** *@
+
+
+<head>
+    <link rel="stylesheet" href="~/css/drag.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+</head>
+
+<body>
+    <div class="kanban">
+
+        
+
+        <div class="board" style="margin-left: 9%;margin-top: 3%;">
+            <div class="list">
+                <div class="list-title">Backlog</div>
+                <div class="list-content">
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="label-group">
+                                <div class="label label-orange"></div>
+                            </div>
+                            <div class="card-title">
+                                Add user registration form
+                            </div>
+                            <div class="card-details">
+
+                                <div class="due-date overdue">
+                                    <i class="far fa-clock"></i>
+                                    1 May
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="label-group">
+                                <div class="label label-blue"></div>
+                            </div>
+                            <div class="card-title">
+                                Create login system
+                            </div>
+                            <div class="card-details">
+                                < <div class="due-date overdue">
+                                    <i class="far fa-clock"></i>
+                                    1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-green"></div>
+                        </div>
+                        <div class="card-title">
+                            Add user profile feature
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-purple"></div>
+                        </div>
+                        <div class="card-title">
+                            Create password reset functionality
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-orange"></div>
+                        </div>
+                        <div class="card-title">
+                            Develop email notification system
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="list">
+            <div class="list-title">To Do</div>
+            <div class="list-content">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-green"></div>
+                        </div>
+                        <div class="card-title">
+                            Design homepage layout
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-purple"></div>
+                        </div>
+                        <div class="card-title">
+                            Implement payment gateway
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-blue"></div>
+                        </div>
+                        <div class="card-title">
+                            Write unit tests for API
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-green"></div>
+                        </div>
+                        <div class="card-title">
+                            Create blog post feature
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-purple"></div>
+                        </div>
+                        <div class="card-title">
+                            Add comments section to posts
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="list">
+            <div class="list-title">In Progress</div>
+            <div class="list-content">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-orange"></div>
+                        </div>
+                        <div class="card-title">
+                            Conduct user testing
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-blue"></div>
+                        </div>
+                        <div class="card-title">
+                            Integrate third-party APIs
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-green"></div>
+                        </div>
+                        <div class="card-title">
+                            Optimize website performance
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-purple"></div>
+                        </div>
+                        <div class="card-title">
+                            Finalize website design
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-blue"></div>
+                        </div>
+                        <div class="card-title">
+                            Prepare deployment scripts
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="list">
+            <div class="list-title">Done</div>
+            <div class="list-content">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-purple"></div>
+                        </div>
+                        <div class="card-title">
+                            Launch website
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-green"></div>
+                        </div>
+                        <div class="card-title">
+                            Set up hosting
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-blue"></div>
+                        </div>
+                        <div class="card-title">
+                            Prepare marketing materials
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-orange"></div>
+                        </div>
+                        <div class="card-title">
+                            Publish blog post
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="label-group">
+                            <div class="label label-green"></div>
+                        </div>
+                        <div class="card-title">
+                            Submit final report
+                        </div>
+                        <div class="card-details">
+                            <div class="due-date overdue">
+                                <i class="far fa-clock"></i>
+                                1 May
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+    </div>
+    <script src="~/js/drag.min.js"></script>
+    <script src="~/js/script.js"></script>
+</body>

@@ -1,96 +1,33 @@
 @model ProjectDashboard.Models.UserHomeViewModel
 
 @{
-    ViewData["Title"] = "User Page - Home";
+    ViewData["Title"] = "User Home Page - Home";
     ViewData["navbarHideToggle"] = true;
     ViewData["isMenu"] = false;
     ViewData["menuFixed"] = "";
 }
-@* ************** Content ************** *@
 
-<style>
-    #calendar {
-        margin: 20px auto;
-        max-width: 1200px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .fc-toolbar-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-    }
-
-    .fc-daygrid-event {
-        white-space: normal;
-        padding: 5px;
-        border-radius: 4px;
-    }
-
-    .fc-more-link {
-        color: #0d6efd;
-        text-decoration: underline;
-    }
-
-    .fc-daygrid-day-number {
-        font-weight: bold;
-        color: #333;
-    }
-
-    .welcome-header {
-        text-align: left;
-        margin-left: 2%;
-        color: #A2A4FF;
-        font-weight: bolder;
-        margin-bottom: -0.5%;
-        margin-top: -2.5%;
-        font-size: 1.25rem;
-    }
-
-    .calendar-link {
-        color: grey;
-        font-size: 0.9rem;
-        text-decoration: none;
-        margin-left: 10px;
-        transition: color 0.3s ease;
-    }
-
-    .calendar-link:hover {
-        color: #A2A4FF;
-        text-decoration: underline;
-    }
-
-    .calendar-container {
-        margin-top: 20px;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        background-color: #fff;
-    }
-</style>
-
+<link rel="stylesheet" href="~/css/user.css" />
 
 <!-- FullCalendar CSS -->
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+<!-- Dragula for Drag and Drop -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.3/dragula.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.3/dragula.min.css" />
 
 <div class="layout-demo-wrapper">
-
     <div class="layout-demo-info">
         <h5 class="welcome-header">
             Welcome @Model.employee.Name!
-            <a href="#calendar-section" class="calendar-link">Get into your Calendar?</a>
+            <a href="#calendar-section" class="calendar-link">Get into your Calendar?</a> | <a class="calendar-link"
+                href="#kanban">Get into your Kanban?</a>
         </h5>
         <!-- Content wrapper -->
         <div class="content-wrapper">
-
             <!-- Content -->
-
             <div class="container-xxl flex-grow-1 container-p-y">
 
-
-                <!-- Cards with few info -->
+                <!-- Centered align Cards -->
                 <div class="row">
                     <!-- single card  -->
                     <div class="col-12 mb-6">
@@ -220,53 +157,133 @@
                 </div>
                 <!--/ Centered align Cards -->
 
-                @* Calendar Section *@
+
+                <!-- Calendar Section -->
                 <div id="calendar-section" class="calendar-container">
                     <div id="calendar"></div>
                 </div>
 
+                <!-- Kanban Section -->
+                <div id="kanban" class="kanban-container">
+                    <h2 style="color: #A2A4FF; font-weight: bolder;">Kanban</h2>
+                    <div class="kanban-board">
+                        <div class="kanban-column" id="backlog">
+                            <h3>Backlog</h3>
+                            <div class="kanban-task" data-task-id="1">
+                                <div class="task-title">Design Homepage</div>
+                                <div class="task-priority high">High Priority</div>
+                                <div class="task-details">
+                                    <div>End Date: 2023-10-25</div>
+                                    <div>Time Left: 3 days</div>
+                                </div>
+                                <div class="task-progress">
+                                    <div class="task-progress-bar" style="width: 30%;"></div>
+                                </div>
+                                <div class="task-assigned">Project : <b>John Doe</b></div>
+                            </div>
+                            <div class="kanban-task" data-task-id="2">
+                                <div class="task-title">Fix Bugs</div>
+                                <div class="task-priority medium">Medium Priority</div>
+                                <div class="task-details">
+                                    <div>End Date: 2023-10-28</div>
+                                    <div>Time Left: 6 days</div>
+                                </div>
+                                <div class="task-progress">
+                                    <div class="task-progress-bar" style="width: 10%;"></div>
+                                </div>
+                                <div class="task-assigned">Project : <b>Jane Smith</b></div>
+                            </div>
+                        </div>
+                        <div class="kanban-column" id="todo">
+                            <h3>To Do</h3>
+                            <div class="kanban-task" data-task-id="3">
+                                <div class="task-title">Implement API</div>
+                                <div class="task-priority high">High Priority</div>
+                                <div class="task-details">
+                                    <div>End Date: 2023-10-22</div>
+                                    <div>Time Left: 1 day</div>
+                                </div>
+                                <div class="task-progress">
+                                    <div class="task-progress-bar" style="width: 80%;"></div>
+                                </div>
+                                <div class="task-assigned">Project : <b>Alice Johnson</b></div>
+                            </div>
+                        </div>
+                        <div class="kanban-column" id="in-progress">
+                            <h3>In Progress</h3>
+                            <div class="kanban-task" data-task-id="4">
+                                <div class="task-title"> Write Documentation v1</div>
+                                <div class="task-priority low">Low Priority</div>
+                                <div class="task-details">
+                                    <div>End Date: 2023-10-20</div>
+                                    <div>Time Left: Completed</div>
+                                </div>
+                                <div class="task-progress">
+                                    <div class="task-progress-bar" style="width: 100%;"></div>
+                                </div>
+                                <div class="task-assigned">Project : <b>Bob Brown</b></div>
+                            </div>
+                        </div>
+                        <div class="kanban-column" id="done">
+                            <h3>Done</h3>
+                            <div class="kanban-task" data-task-id="5">
+                                <div class="task-title">Write Documentation</div>
+                                <div class="task-priority low">Low Priority</div>
+                                <div class="task-details">
+                                    <div>End Date: 2023-10-20</div>
+                                    <div>Time Left: Completed</div>
+                                </div>
+                                <div class="task-progress">
+                                    <div class="task-progress-bar" style="width: 100%;"></div>
+                                </div>
+                                <div class="task-assigned">Project : <b>Bob Brown</b></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- / Content -->
-
-
-
-
+            <!-- /Content -->
         </div>
     </div>
 </div>
 
-
-
 @section PageScripts {
     <script>
-
         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize FullCalendar
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                                                                                @* plugins : ['dayGrid', 'timeGrid', 'list'], *@
                 initialView: 'dayGridMonth',
                 height: 'auto',
                 contentHeight: 'auto',
                 aspectRatio: 1.5,
                 headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
                 dayMaxEvents: true,
                 eventTimeFormat: {
-                hour: 'numeric',
-                minute: '2-digit',
-                meridiem: 'short'
-            },
-                events: @Html.Raw(Json.Serialize(Model.calendarEvents)), // Pass events from ViewModel
-                eventColor: '#378006', // Default event color (green)
-                eventTextColor: '#fff', // White text for better contrast
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    meridiem: 'short'
+                },
+                events: @Html.Raw(Json.Serialize(Model.calendarEvents)),
+                eventColor: '#378006',
+                eventTextColor: '#fff'
+            });
+            calendar.render();
 
-                                                                            });
-        calendar.render();
-                                                                        });
-
-
+            // Initialize Dragula for Kanban
+            dragula([document.getElementById('todo'), document.getElementById('in-progress'), document.getElementById('done'), document.getElementById('backlog')])
+                .on('drag', function (el) {
+                    el.classList.add('dragging');
+                })
+                .on('drop', function (el, target, source, sibling) {
+                    el.classList.remove('dragging');
+                    console.log('Task moved:', el.dataset.taskId, 'from', source.id, 'to', target.id);
+                    // AJAX calls here to update the task status on the server
+                });
+        });
     </script>
 }
