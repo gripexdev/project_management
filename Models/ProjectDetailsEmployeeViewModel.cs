@@ -8,5 +8,6 @@ namespace ProjectDashboard.Models
         public string Name { get; set; } = string.Empty;
         public string? RoleInProject { get; set; }
         public DateTime JoinedDate { get; set; }
+        public List<Task> Tasks { get; set; } = new List<Task>();
     }
 }

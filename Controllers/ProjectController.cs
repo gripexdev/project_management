@@ -260,47 +260,52 @@ namespace ProjectDashboard.Controllers
 
         // Fetch Project Details
         [HttpGet]
-        public IActionResult Details(int id)
+public IActionResult Details(int id)
+{
+    try
+    {
+        // Fetch the project with its assigned employees and their tasks
+        var project = _context.Projects
+            .Include(p => p.ProjectEmployees)
+                .ThenInclude(pe => pe.Employee)
+            .Include(p => p.Tasks) // Include tasks for the project
+            .FirstOrDefault(p => p.Id == id);
+
+        if (project == null)
         {
-            try
-            {
-                // Fetch the project with its assigned employees
-                var project = _context.Projects
-                    .Include(p => p.ProjectEmployees)
-                        .ThenInclude(pe => pe.Employee)
-                    .FirstOrDefault(p => p.Id == id);
-
-                if (project == null)
-                {
-                    return NotFound(); // Return 404 if the project is not found
-                }
-
-                // Prepare the view model
-                var viewModel = new ProjectDetailsViewModel
-                {
-                    Id = project.Id,
-                    Name = project.Name,
-                    Description = project.Description,
-                    StartDate = project.StartDate,
-                    EndDate = project.EndDate,
-                    Status = project.Status,
-                    AssignedEmployees = project.ProjectEmployees.Select(pe => new ProjectDetailsEmployeeViewModel
-                    {
-                        Id = pe.Employee.Id,
-                        Name = pe.Employee.Name,
-                        RoleInProject = pe.RoleInProject,
-                        JoinedDate = pe.JoinedDate
-                    }).ToList()
-                };
-
-                return View(viewModel);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching project details.");
-                return View("Error");
-            }
+            return NotFound(); // Return 404 if the project is not found
         }
+
+        // Prepare the view model
+        var viewModel = new ProjectDetailsViewModel
+        {
+            Id = project.Id,
+            Name = project.Name,
+            Description = project.Description,
+            StartDate = project.StartDate,
+            EndDate = project.EndDate,
+            Status = project.Status,
+            AssignedEmployees = project.ProjectEmployees.Select(pe => new ProjectDetailsEmployeeViewModel
+            {
+                Id = pe.Employee.Id,
+                Name = pe.Employee.Name,
+                RoleInProject = pe.RoleInProject,
+                JoinedDate = pe.JoinedDate,
+                // Populate the Tasks property with tasks assigned to the employee
+                Tasks = project.Tasks
+                    .Where(t => t.EmployeeId == pe.EmployeeId)
+                    .ToList()
+            }).ToList()
+        };
+
+        return View(viewModel);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error fetching project details.");
+        return View("Error");
+    }
+}
 
         // assign task to employee
         [HttpPost]
