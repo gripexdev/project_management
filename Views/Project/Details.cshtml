@@ -4,7 +4,6 @@
     ViewData["Title"] = "Project Details Page";
 }
 
-@* TODO: Show tasks for for forEach employee for employee *@
 <div class="container mt-4">
     <!-- Project Details Card -->
     <div class="card shadow-sm mb-5">
@@ -66,9 +65,8 @@
                                     <p class="card-text"><strong>Role:</strong> @employee.RoleInProject</p>
                                     <p class="card-text"><small class="text-muted">Joined on
                                             @employee.JoinedDate.ToShortDateString()</small></p>
-
                                     <!-- Tasks Accordion -->
-                                    <div class="accordion mt-3" id="tasksAccordion-@employee.Id">
+                                    <div class="accordion mt-3" id="tasksAccordion">
                                         <div class="accordion-item">
                                             <h2 class="accordion-header" id="heading-@employee.Id">
                                                 <button class="accordion-button collapsed" type="button"
@@ -78,8 +76,7 @@
                                                 </button>
                                             </h2>
                                             <div id="collapse-@employee.Id" class="accordion-collapse collapse"
-                                                aria-labelledby="heading-@employee.Id"
-                                                data-bs-parent="#tasksAccordion-@employee.Id">
+                                                aria-labelledby="heading-@employee.Id" data-bs-parent="#tasksAccordion">
                                                 <div class="accordion-body">
                                                     @if (employee.Tasks.Any())
                                                     {
@@ -91,16 +88,32 @@
                                                                     <p class="mb-1">@task.TaskDescription</p>
                                                                     <small class="text-muted">
                                                                         <strong>Status:</strong> @task.Status |
-                                                                        <strong>Priority:</strong> @task.Priority |
-                                                                        <strong>Progress:</strong>
-                                                                    </small>
-                                                                    <!-- Progress Bar -->
-                                                                    <div class="progress mt-2" style="height: 16px;">
-                                                                        <div class="progress-bar" role="progressbar" style="width: @task.Progress%;" aria-valuenow="@task.Progress" aria-valuemin="0" aria-valuemax="100">
-                                                                            @task.Progress%
-                                                                        </div>
+                                                                        <strong>Priority:</strong>
+                                                                        @if (task.Priority.ToString() == "High")
+                                                                        {
+                                                                            <span class="badge bg-danger">High</span>
+                                                                        }
+                                                                        else if (task.Priority.ToString() == "Medium")
+                                                                        {
+                                                                            <span class="badge bg-warning text-dark">Medium</span>
+                                                                        }
+                                                                        else if (task.Priority.ToString() == "Low")
+                                                                        {
+                                                                            <span class="badge bg-success">Low</span>
+                                                                        }
+                                                                </small>
+                                                                <div class="progress mt-2" style="height: 16px;">
+                                                                    <div class="progress-bar 
+                                                                                    @(task.Priority.ToString() == "High" ? "bg-danger" :
+                                                                                        task.Priority.ToString() == "Medium" ? "bg-warning" :
+                                                                                        "bg-success")" role="progressbar"
+                                                                        style="width: @task.Progress%;"
+                                                                        aria-valuenow="@task.Progress" aria-valuemin="0"
+                                                                        aria-valuemax="100">
+                                                                        @task.Progress%
                                                                     </div>
-                                                                </li>
+                                                                </div>
+                                                            </li>
                                                             }
                                                         </ul>
                                                     }
@@ -121,7 +134,7 @@
                                             <i class="bx bx-plus me-1"></i> Task
                                         </button>
                                         <!-- Unassign Employee Button -->
-                                        <button type="button" class="btn btn-danger btn-sm flex-grow-1"
+                                        <button type="type" class="btn btn-danger btn-sm flex-grow-1"
                                             onclick="unassignEmployee(@Model.Id, @employee.Id)">
                                             <i class="bx bx-trash me-1"></i> Unassign
                                         </button>
@@ -326,15 +339,15 @@
             toastElement.setAttribute('data-bs-delay', '3000');
 
             var toastBody = `
-                                                            <div class="toast-header">
-                                                                <i class='bx bx-bell me-2'></i>
-                                                                <strong class="me-auto">Notification</strong>
-                                                                <small>Just now</small>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                                            </div>
-                                                            <div class="toast-body">
-                                                                ${message}
-                                                            </div>`;
+                                                                        <div class="toast-header">
+                                                                            <i class='bx bx-bell me-2'></i>
+                                                                            <strong class="me-auto">Notification</strong>
+                                                                            <small>Just now</small>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="toast-body">
+                                                                            ${message}
+                                                                        </div>`;
 
             toastElement.innerHTML = toastBody;
 
