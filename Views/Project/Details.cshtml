@@ -175,6 +175,15 @@
                         <span id="taskDescriptionError" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Priority</label>
+                        <select id="taskPriority" name="Priority" class="form-select">
+                            <option value="0">Low</option>
+                            <option value="1">Medium</option>
+                            <option value="2">High</option>
+                        </select>
+                        <span id="taskPriorityError" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Start Date</label>
                         <input type="date" id="startDate" name="StartDate" class="form-control" />
                         <span id="startDateError" class="text-danger"></span>
@@ -217,7 +226,6 @@
             document.getElementById('endDateError').innerText = '';
         }
 
-        // TODO: add prioriy to the task creation form
         // Handle form submission for adding a task
         document.getElementById('createTaskForm').addEventListener('submit', function (e) {
             e.preventDefault();
@@ -230,6 +238,7 @@
             const employeeId = document.getElementById('employeeId').value;
             const taskName = document.getElementById('taskName').value;
             const taskDescription = document.getElementById('taskDescription').value;
+            const taskPriority = document.getElementById('taskPriority').value; // Get priority value
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
 
@@ -266,6 +275,7 @@
                     EmployeeId: parseInt(employeeId),
                     TaskName: taskName,
                     TaskDescription: taskDescription,
+                    Priority: parseInt(taskPriority), // Include priority
                     StartDate: startDate,
                     EndDate: endDate
                 })
