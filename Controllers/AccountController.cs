@@ -112,6 +112,16 @@ public class AccountController : Controller
     [HttpGet]
     public async Task<IActionResult> Profile()
     {
+        var user = await _userManager.GetUserAsync(HttpContext.User);
+        //check roles
+        var roles = await _userManager.GetRolesAsync(user);
+        if (roles.Contains("Admin"))
+        {
+            ViewData["Role"] = "Admin";
+            return View();
+        }
+
+        ViewData["Role"] = "User";
         return View();
     }
 

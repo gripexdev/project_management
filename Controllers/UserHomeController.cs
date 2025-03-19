@@ -152,10 +152,5 @@ namespace ProjectDashboard.Controllers
 
         }
 
-
-        [HttpGet]
-        public IActionResult Kanban(){
-            return View();
-        }
     }
 }
