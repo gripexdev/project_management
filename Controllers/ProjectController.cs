@@ -395,5 +395,37 @@ public IActionResult Details(int id)
                 return Json(new { success = false, message = $"Error unassigning employee: {ex.Message}" });
             }
         }
+
+        // Delete Task
+        [HttpPost]
+        public IActionResult DeleteTask([FromBody] DeleteTaskViewModel model)
+        {
+            try
+            {
+                // Validate input
+                if (model == null || model.TaskId <= 0)
+                {
+                    return Json(new { success = false, message = "Invalid task ID." });
+                }
+
+                // Find the task to delete
+                var task = _context.Tasks.Find(model.TaskId);
+                if (task == null)
+                {
+                    return Json(new { success = false, message = "Task not found." });
+                }
+
+                // Delete the task
+                _context.Tasks.Remove(task);
+                _context.SaveChanges();
+
+                return Json(new { success = true, message = "Task deleted successfully!" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting task.");
+                return Json(new { success = false, message = $"Error deleting task: {ex.Message}" });
+            }
+        }
     }
 }
