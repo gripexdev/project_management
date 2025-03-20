@@ -5,6 +5,45 @@
     ViewData["navbarHideToggle"] = true;
     ViewData["isMenu"] = false;
     ViewData["menuFixed"] = "";
+
+    //functions that calculates time left for the task
+    string GetTimeLeft(DateTime? endDate)
+    {
+        if (endDate == null)
+        {
+            return "--";
+        }
+        var timeLeft = endDate.Value - DateTime.Now;
+        return timeLeft.Days.ToString();
+    }
+
+    string GetProgress(DateTime? startDate, DateTime? endDate)
+    {
+        if (startDate == null || endDate == null)
+        {
+            return "--";
+        }
+
+        var totalDuration = endDate.Value - startDate.Value;
+        var timeElapsed = DateTime.Now - startDate.Value;
+
+        // Handle invalid cases (start date is in the future)
+        if (totalDuration.TotalDays <= 0 || timeElapsed.TotalDays < 0)
+        {
+            return "0%";
+        }
+
+        // Calculate progress percentage
+        double progress = (timeElapsed.TotalDays / totalDuration.TotalDays) * 100;
+
+        // Cap progress at 100%
+        if (progress > 100)
+        {
+            progress = 100;
+        }
+
+        return $"{progress:F0}%"; // Format as a percentage with no decimal places
+    }
 }
 
 <link rel="stylesheet" href="~/css/user.css" />
@@ -169,75 +208,102 @@
                     <div class="kanban-board">
                         <div class="kanban-column" id="backlog">
                             <h3>Backlog</h3>
-                            <div class="kanban-task" data-task-id="1">
-                                <div class="task-title">Design Homepage</div>
-                                <div class="task-priority high">High Priority</div>
-                                <div class="task-details">
-                                    <div>End Date: 2023-10-25</div>
-                                    <div>Time Left: 3 days</div>
-                                </div>
-                                <div class="task-progress">
-                                    <div class="task-progress-bar" style="width: 30%;"></div>
-                                </div>
-                                <div class="task-assigned">Project : <b>John Doe</b></div>
-                            </div>
-                            <div class="kanban-task" data-task-id="2">
-                                <div class="task-title">Fix Bugs</div>
-                                <div class="task-priority medium">Medium Priority</div>
-                                <div class="task-details">
-                                    <div>End Date: 2023-10-28</div>
-                                    <div>Time Left: 6 days</div>
-                                </div>
-                                <div class="task-progress">
-                                    <div class="task-progress-bar" style="width: 10%;"></div>
-                                </div>
-                                <div class="task-assigned">Project : <b>Jane Smith</b></div>
-                            </div>
+                            @{
+                                int index = 1;
+                            }
+                            @if (Model.tasks != null)
+                            {
+                                foreach (var task in Model.tasks.Where(t => t.Status ==
+                                ProjectDashboard.Models.TaskStatus.Backlog))
+                                {
+                                    <div class="kanban-task" data-task-id="@index">
+                                        <div class="task-title">@task.TaskName</div>
+                                        <div class="task-priority high">@task.Priority</div>
+                                        <div class="task-details">
+                                            <div>End Date: @(task.EndDate?.ToString("dd/MM/yyyy") ?? "N/A")</div>
+                                            <div>Time Left: @(GetTimeLeft(task.EndDate)) days</div>
+                                        </div>
+                                        <div class="task-progress">
+                                            <div class="task-progress-bar"
+                                                style="width: @(GetProgress(task.StartDate, task.EndDate));"></div>
+                                        </div>
+                                        <div class="task-assigned">Project : <b>@task.Project.Name</b></div>
+                                    </div>
+                                    index++;
+                                }
+                            }
                         </div>
                         <div class="kanban-column" id="todo">
                             <h3>To Do</h3>
-                            <div class="kanban-task" data-task-id="3">
-                                <div class="task-title">Implement API</div>
-                                <div class="task-priority high">High Priority</div>
-                                <div class="task-details">
-                                    <div>End Date: 2023-10-22</div>
-                                    <div>Time Left: 1 day</div>
-                                </div>
-                                <div class="task-progress">
-                                    <div class="task-progress-bar" style="width: 80%;"></div>
-                                </div>
-                                <div class="task-assigned">Project : <b>Alice Johnson</b></div>
-                            </div>
+                            @if (Model.tasks != null)
+                            {
+                                foreach (var task in Model.tasks.Where(t => t.Status ==
+                                ProjectDashboard.Models.TaskStatus.Todo))
+                                {
+                                    <div class="kanban-task" data-task-id="@index">
+                                        <div class="task-title">@task.TaskName</div>
+                                        <div class="task-priority high">@task.Priority</div>
+                                        <div class="task-details">
+                                            <div>End Date: @(task.EndDate?.ToString("dd/MM/yyyy") ?? "N/A")</div>
+                                            <div>Time Left: @(GetTimeLeft(task.EndDate)) days</div>
+                                        </div>
+                                        <div class="task-progress">
+                                            <div class="task-progress-bar"
+                                                style="width: @(GetProgress(task.StartDate, task.EndDate));"></div>
+                                        </div>
+                                        <div class="task-assigned">Project : <b>@task.Project.Name</b></div>
+                                    </div>
+                                    index++;
+                                }
+                            }
                         </div>
-                        <div class="kanban-column" id="in-progress">
+                        <div class="kanban-column" id="InProgress">
                             <h3>In Progress</h3>
-                            <div class="kanban-task" data-task-id="4">
-                                <div class="task-title"> Write Documentation v1</div>
-                                <div class="task-priority low">Low Priority</div>
-                                <div class="task-details">
-                                    <div>End Date: 2023-10-20</div>
-                                    <div>Time Left: Completed</div>
-                                </div>
-                                <div class="task-progress">
-                                    <div class="task-progress-bar" style="width: 100%;"></div>
-                                </div>
-                                <div class="task-assigned">Project : <b>Bob Brown</b></div>
-                            </div>
+                            @if (Model.tasks != null)
+                            {
+                                foreach (var task in Model.tasks.Where(t => t.Status ==
+                                ProjectDashboard.Models.TaskStatus.InProgress))
+                                {
+                                    <div class="kanban-task" data-task-id="@index">
+                                        <div class="task-title">@task.TaskName</div>
+                                        <div class="task-priority high">@task.Priority</div>
+                                        <div class="task-details">
+                                            <div>End Date: @(task.EndDate?.ToString("dd/MM/yyyy") ?? "N/A")</div>
+                                            <div>Time Left: @(GetTimeLeft(task.EndDate)) days</div>
+                                        </div>
+                                        <div class="task-progress">
+                                            <div class="task-progress-bar"
+                                                style="width: @(GetProgress(task.StartDate, task.EndDate));"></div>
+                                        </div>
+                                        <div class="task-assigned">Project : <b>@task.Project.Name</b></div>
+                                    </div>
+                                    index++;
+                                }
+                            }
                         </div>
-                        <div class="kanban-column" id="done">
+                        <div class="kanban-column" id="Completed">
                             <h3>Done</h3>
-                            <div class="kanban-task" data-task-id="5">
-                                <div class="task-title">Write Documentation</div>
-                                <div class="task-priority low">Low Priority</div>
-                                <div class="task-details">
-                                    <div>End Date: 2023-10-20</div>
-                                    <div>Time Left: Completed</div>
-                                </div>
-                                <div class="task-progress">
-                                    <div class="task-progress-bar" style="width: 100%;"></div>
-                                </div>
-                                <div class="task-assigned">Project : <b>Bob Brown</b></div>
-                            </div>
+                            @if (Model.tasks != null)
+                            {
+                                foreach (var task in Model.tasks.Where(t => t.Status ==
+                                ProjectDashboard.Models.TaskStatus.Completed))
+                                {
+                                    <div class="kanban-task" data-task-id="@index">
+                                        <div class="task-title">@task.TaskName</div>
+                                        <div class="task-priority high">@task.Priority</div>
+                                        <div class="task-details">
+                                            <div>End Date: @(task.EndDate?.ToString("dd/MM/yyyy") ?? "N/A")</div>
+                                            <div>Time Left: @(GetTimeLeft(task.EndDate)) days</div>
+                                        </div>
+                                        <div class="task-progress">
+                                            <div class="task-progress-bar"
+                                                style="width: @(GetProgress(task.StartDate, task.EndDate));"></div>
+                                        </div>
+                                        <div class="task-assigned">Project : <b>@task.Project.Name</b></div>
+                                    </div>
+                                    index++;
+                                }
+                            }
                         </div>
                     </div>
                 </div>
@@ -275,14 +341,39 @@
             calendar.render();
 
             // Initialize Dragula for Kanban
-            dragula([document.getElementById('todo'), document.getElementById('in-progress'), document.getElementById('done'), document.getElementById('backlog')])
+            dragula([document.getElementById('backlog'), document.getElementById('todo'), document.getElementById('InProgress'), document.getElementById('Completed')])
                 .on('drag', function (el) {
                     el.classList.add('dragging');
                 })
-                .on('drop', function (el, target, source, sibling) {
+                .on('drop', async function (el, target, source, sibling) {
                     el.classList.remove('dragging');
-                    console.log('Task moved:', el.dataset.taskId, 'from', source.id, 'to', target.id);
-                    // AJAX calls here to update the task status on the server
+
+                    // Extract task ID and target column status
+                    const taskId = el.dataset.taskId;
+                    const targetStatus = target.id; // e.g., "backlog", "todo", "InProgress", "Completed"
+
+                    try {
+                        // Make an AJAX POST request to update the task status
+                        const response = await fetch('/UserHome/updateTaskStatus', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                taskId: taskId,
+                                status: targetStatus.charAt(0).toUpperCase() + targetStatus.slice(1) // Convert to PascalCase
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to update task status');
+                        }
+
+                        console.log(`Task ${taskId} moved to ${targetStatus}`);
+                    } catch (error) {
+                        console.error('Error updating task status:', error);
+                        alert('An error occurred while updating the task status. Please try again.');
+                    }
                 });
         });
     </script>

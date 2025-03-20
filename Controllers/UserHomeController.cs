@@ -96,6 +96,10 @@ namespace ProjectDashboard.Controllers
             userHomeViewModel.activeProjectsCount = employee.ProjectEmployees.Count(pe => pe.Project.Status == ProjectStatus.InProgress);
             userHomeViewModel.completedProjectsCount = employee.ProjectEmployees.Count(pe => pe.Project.Status == ProjectStatus.Completed);
 
+
+            // Kanban data
+            userHomeViewModel.tasks = employee.Tasks.ToList();
+
             // Pass the employee data to the view
             return View(userHomeViewModel);
         }
@@ -150,6 +154,40 @@ namespace ProjectDashboard.Controllers
 
             return View(userHomeViewModel);
 
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> updateTaskStatus([FromBody] UpdateTaskStatusRequest request)
+        {
+            if (request == null || request.TaskId <= 0 || string.IsNullOrWhiteSpace(request.Status))
+            {
+                return BadRequest("Invalid request data");
+            }
+
+            var task = await _context.Tasks.FindAsync(request.TaskId);
+            if (task == null)
+            {
+                return NotFound("Task not found");
+            }
+
+            // Parse the status string into the TaskStatus enum
+            if (Enum.TryParse(typeof(Models.TaskStatus), request.Status, out var parsedStatus) && parsedStatus != null)
+            {
+                task.Status = (Models.TaskStatus)parsedStatus;
+                _context.Tasks.Update(task);
+                await _context.SaveChangesAsync();
+                return Ok(task);
+            }
+
+            return BadRequest("Invalid status value");
+        }
+
+        // Helper class for deserializing the request body
+        public class UpdateTaskStatusRequest
+        {
+            public int TaskId { get; set; }
+            public string Status { get; set; }
         }
 
     }

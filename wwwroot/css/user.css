@@ -181,12 +181,12 @@
   /* Red for To Do */
 }
 
-#in-progress .kanban-task {
+#InProgress .kanban-task {
   border-left: 4px solid #4dabf7;
   /* Blue for In Progress */
 }
 
-#done .kanban-task {
+#Completed .kanban-task {
   border-left: 4px solid #51cf66;
   /* Green for Done */
 }
