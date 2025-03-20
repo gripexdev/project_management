@@ -41,11 +41,27 @@
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown"
           aria-expanded="false">
-          Notifications
-          <span id="notificationBadge" class="badge bg-danger"></span>
+          <i class="bx bx-bell bx-md"></i> <!-- Notification icon -->
+          <!-- Hide badge if there are no notifications -->
+          <span id="notificationBadge" class="badge bg-danger" style="display: none;">0</span>
         </a>
-        <ul id="notificationList" class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+        <ul id="notificationList" class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="notificationsDropdown"
+          style="width: 300px;">
+          <li class="dropdown-header">
+            <h6 class="mb-0">Notifications</h6>
+            <small class="text-muted">You have <span id="notificationCount">0</span> new notifications</small>
+          </li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
           <!-- Notifications will be dynamically loaded here -->
+          <div id="notificationItems" class="notification-items">
+            <!-- Notification items will be inserted here by JavaScript -->
+          </div>
+          <!-- Replace "View all notifications" with a cool message -->
+          <li class="dropdown-footer text-center">
+            <p class="text-muted mb-0">You're all caught up! 🎉</p>
+          </li>
         </ul>
       </li>
     }
@@ -109,26 +125,45 @@
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const notificationBadge = document.getElementById('notificationBadge');
-      const notificationList = document.getElementById('notificationList');
+      const notificationCount = document.getElementById('notificationCount');
+      const notificationItems = document.getElementById('notificationItems');
+      const dropdownFooter = document.querySelector('#notificationList .dropdown-footer');
 
       async function fetchNotifications() {
         const response = await fetch('/UserHome/GetNotifications');
         const notifications = await response.json();
 
         // Update badge count
-        notificationBadge.textContent = notifications.length;
+        if (notifications.length > 0) {
+          notificationBadge.textContent = notifications.length;
+          notificationBadge.style.display = 'inline-block'; // Show badge
+          notificationCount.textContent = notifications.length;
+          dropdownFooter.innerHTML = `<p class="text-muted mb-0">You're all caught up! 🎉</p>`; // Update footer message
+        } else {
+          notificationBadge.style.display = 'none'; // Hide badge
+          notificationCount.textContent = '0';
+          dropdownFooter.innerHTML = `<p class="text-muted mb-0">No new notifications. 🎉</p>`; // Update footer message
+        }
 
-        // Populate dropdown
-        notificationList.innerHTML = '';
+        // Clear existing notifications
+        notificationItems.innerHTML = '';
+
+        // Populate dropdown with notifications
         notifications.forEach(notification => {
-          const li = document.createElement('li');
-          li.classList.add('dropdown-item');
-          li.innerHTML = `
-                        <div>${notification.message}</div>
-                        <small class="text-muted">${new Date(notification.createdAt).toLocaleString()}</small>
-                        <button class="btn btn-sm btn-link mark-as-read" data-id="${notification.id}">Mark as Read</button>
-                    `;
-          notificationList.appendChild(li);
+          const notificationItem = document.createElement('div');
+          notificationItem.classList.add('notification-item', 'p-2', 'mb-2', 'border-bottom');
+          notificationItem.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="mb-1">${notification.message}</p>
+                <small class="text-muted">${new Date(notification.createdAt).toLocaleString()}</small>
+              </div>
+              <button class="btn btn-sm btn-link mark-as-read" data-id="${notification.id}">
+                <i class="bx bx-check"></i>
+              </button>
+            </div>
+          `;
+          notificationItems.appendChild(notificationItem);
         });
 
         // Add event listeners for "Mark as Read"
