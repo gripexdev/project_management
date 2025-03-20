@@ -14,7 +14,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(8, 0, 36))));
 
-
 // Add Identity services
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
@@ -36,34 +35,50 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
-//seed roles
+// Apply migrations and seed data
 using (var scope = app.Services.CreateScope())
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-    await RoleSeeder.seedRolesAsync(roleManager);
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<AppDbContext>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 
-    // Check if admin user exists
-    var adminEmail = "admin@admin.com";
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-    if (adminUser == null)
+    try
     {
-        // Create admin user
-        var admin = new IdentityUser
-        {
-            UserName = adminEmail,
-            Email = adminEmail,
-            EmailConfirmed = true
-        };
+        // Apply pending migrations
+        await dbContext.Database.MigrateAsync();
 
-        var result = await userManager.CreateAsync(admin, "adminadminA1");
+        // Seed roles
+        await RoleSeeder.seedRolesAsync(roleManager);
 
-        if (result.Succeeded)
+        // Seed admin user
+        var adminEmail = "admin@admin.com";
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+        if (adminUser == null)
         {
-            // Assign the Admin role to the admin user
-            await userManager.AddToRoleAsync(admin, "Admin");
+            // Create admin user
+            var admin = new IdentityUser
+            {
+                UserName = adminEmail,
+                Email = adminEmail,
+                EmailConfirmed = true
+            };
+
+            var result = await userManager.CreateAsync(admin, "adminadminA1");
+
+            if (result.Succeeded)
+            {
+                // Assign the Admin role to the admin user
+                await userManager.AddToRoleAsync(admin, "Admin");
+            }
         }
+    }
+    catch (Exception ex)
+    {
+        // Log any errors during migration or seeding
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while applying migrations or seeding data.");
     }
 }
 
