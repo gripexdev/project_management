@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProjectDashboard.Data;
+using ProjectDashboard.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,9 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
+
+// Register NotificationService
+builder.Services.AddScoped<NotificationService>();
 
 // Configure application cookie
 builder.Services.ConfigureApplicationCookie(options =>

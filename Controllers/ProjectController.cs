@@ -3,6 +3,7 @@ using ProjectDashboard.Models;
 using ProjectDashboard.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization; // Required for Skip and Take methods
+using ProjectDashboard.Services;
 
 namespace ProjectDashboard.Controllers
 {
@@ -11,12 +12,14 @@ namespace ProjectDashboard.Controllers
     {
         private readonly ILogger<ProjectController> _logger;
         private readonly AppDbContext _context;
+        private readonly NotificationService _notificationService;
 
         // Constructor accepting AppDbContext
-        public ProjectController(ILogger<ProjectController> logger, AppDbContext context)
+        public ProjectController(ILogger<ProjectController> logger, AppDbContext context, NotificationService notificationService)
         {
             _logger = logger;
             _context = context;
+            _notificationService = notificationService;
         }
 
         // Index action with pagination
@@ -192,13 +195,12 @@ namespace ProjectDashboard.Controllers
 
         // Assign Employee to Project with Role
         [HttpPost]
-        public IActionResult AssignEmployeeToProject([FromBody] AssignEmployeeViewModel model)
+        public async Task<IActionResult> AssignEmployeeToProject([FromBody] AssignEmployeeViewModel model)
         {
             if (model == null)
             {
                 return Json(new { success = false, message = "Invalid data." });
             }
-
             try
             {
                 // Validate input
@@ -206,29 +208,27 @@ namespace ProjectDashboard.Controllers
                 {
                     return Json(new { success = false, message = "Invalid project or employee ID." });
                 }
-
                 if (string.IsNullOrWhiteSpace(model.RoleInProject))
                 {
                     return Json(new { success = false, message = "Role in project is required." });
                 }
 
                 // Check if project and employee exist
-                var project = _context.Projects.Find(model.ProjectId);
-                var employee = _context.Employees.Find(model.EmployeeId);
+                var project = await _context.Projects.FindAsync(model.ProjectId);
+                var employee = await _context.Employees.FindAsync(model.EmployeeId);
 
                 if (project == null)
                 {
                     return Json(new { success = false, message = $"Project with ID {model.ProjectId} not found." });
                 }
-
                 if (employee == null)
                 {
                     return Json(new { success = false, message = $"Employee with ID {model.EmployeeId} not found." });
                 }
 
                 // Check if the employee is already assigned to the project
-                var isAlreadyAssigned = _context.ProjectEmployees
-                    .Any(pe => pe.ProjectId == model.ProjectId && pe.EmployeeId == model.EmployeeId);
+                var isAlreadyAssigned = await _context.ProjectEmployees
+                    .AnyAsync(pe => pe.ProjectId == model.ProjectId && pe.EmployeeId == model.EmployeeId);
 
                 if (isAlreadyAssigned)
                 {
@@ -247,7 +247,11 @@ namespace ProjectDashboard.Controllers
                 };
 
                 _context.ProjectEmployees.Add(projectEmployee);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
+
+                // Create notification
+                await _notificationService.CreateNotificationAsync(employee.Id,
+                    $"You have been assigned to the project: {project.Name} as {model.RoleInProject}");
 
                 return Json(new { success = true, message = "Employee assigned successfully!" });
             }
@@ -260,56 +264,56 @@ namespace ProjectDashboard.Controllers
 
         // Fetch Project Details
         [HttpGet]
-public IActionResult Details(int id)
-{
-    try
-    {
-        // Fetch the project with its assigned employees and their tasks
-        var project = _context.Projects
-            .Include(p => p.ProjectEmployees)
-                .ThenInclude(pe => pe.Employee)
-            .Include(p => p.Tasks) // Include tasks for the project
-            .FirstOrDefault(p => p.Id == id);
-
-        if (project == null)
+        public IActionResult Details(int id)
         {
-            return NotFound(); // Return 404 if the project is not found
-        }
-
-        // Prepare the view model
-        var viewModel = new ProjectDetailsViewModel
-        {
-            Id = project.Id,
-            Name = project.Name,
-            Description = project.Description,
-            StartDate = project.StartDate,
-            EndDate = project.EndDate,
-            Status = project.Status,
-            AssignedEmployees = project.ProjectEmployees.Select(pe => new ProjectDetailsEmployeeViewModel
+            try
             {
-                Id = pe.Employee.Id,
-                Name = pe.Employee.Name,
-                RoleInProject = pe.RoleInProject,
-                JoinedDate = pe.JoinedDate,
-                // Populate the Tasks property with tasks assigned to the employee
-                Tasks = project.Tasks
-                    .Where(t => t.EmployeeId == pe.EmployeeId)
-                    .ToList()
-            }).ToList()
-        };
+                // Fetch the project with its assigned employees and their tasks
+                var project = _context.Projects
+                    .Include(p => p.ProjectEmployees)
+                        .ThenInclude(pe => pe.Employee)
+                    .Include(p => p.Tasks) // Include tasks for the project
+                    .FirstOrDefault(p => p.Id == id);
 
-        return View(viewModel);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error fetching project details.");
-        return View("Error");
-    }
-}
+                if (project == null)
+                {
+                    return NotFound(); // Return 404 if the project is not found
+                }
+
+                // Prepare the view model
+                var viewModel = new ProjectDetailsViewModel
+                {
+                    Id = project.Id,
+                    Name = project.Name,
+                    Description = project.Description,
+                    StartDate = project.StartDate,
+                    EndDate = project.EndDate,
+                    Status = project.Status,
+                    AssignedEmployees = project.ProjectEmployees.Select(pe => new ProjectDetailsEmployeeViewModel
+                    {
+                        Id = pe.Employee.Id,
+                        Name = pe.Employee.Name,
+                        RoleInProject = pe.RoleInProject,
+                        JoinedDate = pe.JoinedDate,
+                        // Populate the Tasks property with tasks assigned to the employee
+                        Tasks = project.Tasks
+                            .Where(t => t.EmployeeId == pe.EmployeeId)
+                            .ToList()
+                    }).ToList()
+                };
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching project details.");
+                return View("Error");
+            }
+        }
 
         // assign task to employee
         [HttpPost]
-        public IActionResult CreateTask([FromBody] Models.Task task)
+        public async Task<IActionResult> CreateTask([FromBody] Models.Task task)
         {
             try
             {
@@ -346,6 +350,10 @@ public IActionResult Details(int id)
                 // Add the task to the database
                 _context.Tasks.Add(task);
                 _context.SaveChanges();
+
+                // Create notification for the assigned employee
+                await _notificationService.CreateNotificationAsync(employee.Id,
+                    $"A new task has been assigned to you: {task.TaskName}");
 
                 return Json(new { success = true, message = "Task created successfully!" });
             }

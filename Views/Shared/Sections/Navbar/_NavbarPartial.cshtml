@@ -34,6 +34,23 @@
   <!-- /Search -->
 
   <ul class="navbar-nav flex-row align-items-center ms-auto">
+
+    <!-- Notifications -->
+    @if (User.IsInRole("User"))
+    {
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown"
+          aria-expanded="false">
+          Notifications
+          <span id="notificationBadge" class="badge bg-danger"></span>
+        </a>
+        <ul id="notificationList" class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+          <!-- Notifications will be dynamically loaded here -->
+        </ul>
+      </li>
+    }
+    <!-- /Notifications -->
+
     <!-- User -->
     <li class="nav-item navbar-dropdown dropdown-user dropdown">
       <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -84,3 +101,47 @@
 
   </ul>
 </div>
+
+
+<!-- Script to fetch notifications -->
+@if (User.IsInRole("User"))
+{
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const notificationBadge = document.getElementById('notificationBadge');
+      const notificationList = document.getElementById('notificationList');
+
+      async function fetchNotifications() {
+        const response = await fetch('/UserHome/GetNotifications');
+        const notifications = await response.json();
+
+        // Update badge count
+        notificationBadge.textContent = notifications.length;
+
+        // Populate dropdown
+        notificationList.innerHTML = '';
+        notifications.forEach(notification => {
+          const li = document.createElement('li');
+          li.classList.add('dropdown-item');
+          li.innerHTML = `
+                        <div>${notification.message}</div>
+                        <small class="text-muted">${new Date(notification.createdAt).toLocaleString()}</small>
+                        <button class="btn btn-sm btn-link mark-as-read" data-id="${notification.id}">Mark as Read</button>
+                    `;
+          notificationList.appendChild(li);
+        });
+
+        // Add event listeners for "Mark as Read"
+        document.querySelectorAll('.mark-as-read').forEach(button => {
+          button.addEventListener('click', async function () {
+            const notificationId = this.getAttribute('data-id');
+            await fetch(`/UserHome/MarkNotificationAsRead/${notificationId}`, { method: 'POST' });
+            fetchNotifications(); // Refresh notifications
+          });
+        });
+      }
+
+      fetchNotifications();
+    });
+  </script>
+}

@@ -13,6 +13,7 @@ namespace ProjectDashboard.Data
         public DbSet<Employee> Employees { get; set; }
         public DbSet<ProjectEmployee> ProjectEmployees { get; set; }
         public DbSet<Models.Task> Tasks { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,6 +44,13 @@ namespace ProjectDashboard.Data
                 .WithMany(e => e.Tasks) // Explicitly map to the Employee's Tasks collection
                 .HasForeignKey(t => t.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure Notification relationships
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Employee)
+                .WithMany()
+                .HasForeignKey(n => n.EmployeeId)
+                .OnDelete(DeleteBehavior.Cascade); // Delete notifications if the employee is deleted
         }
     }
 }

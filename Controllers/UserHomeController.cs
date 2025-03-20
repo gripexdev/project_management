@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectDashboard.Data;
 using ProjectDashboard.Models;
+using ProjectDashboard.Services;
 
 namespace ProjectDashboard.Controllers
 {
@@ -13,11 +14,13 @@ namespace ProjectDashboard.Controllers
 
         private readonly UserManager<IdentityUser> _userManager;
         private readonly AppDbContext _context;
+        private readonly NotificationService _notificationService;
 
-        public UserHomeController(UserManager<IdentityUser> userManager, AppDbContext context)
+        public UserHomeController(UserManager<IdentityUser> userManager, AppDbContext context, NotificationService notificationService)
         {
             _userManager = userManager;
             _context = context;
+            _notificationService = notificationService;
         }
 
         public async Task<IActionResult> Index()
@@ -181,6 +184,36 @@ namespace ProjectDashboard.Controllers
             }
 
             return BadRequest("Invalid status value");
+        }
+
+        // Get unread notifications for the authenticated user
+        [HttpGet]
+        public async Task<IActionResult> GetNotifications()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == user.Email);
+
+            if (employee == null)
+            {
+                return Json(new List<object>());
+            }
+
+            var notifications = await _notificationService.GetUnreadNotificationsAsync(employee.Id);
+
+            return Json(notifications.Select(n => new
+            {
+                id = n.Id,
+                message = n.Message,
+                createdAt = n.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss") // Format date for frontend
+            }));
+        }
+
+        // Mark a notification as read
+        [HttpPost]
+        public async Task<IActionResult> MarkNotificationAsRead(int id)
+        {
+            await _notificationService.MarkAsReadAsync(id);
+            return Ok();
         }
 
         // Helper class for deserializing the request body
