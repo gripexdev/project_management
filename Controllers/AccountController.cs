@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ProjectDashboard.Data;
@@ -43,7 +44,7 @@ public class AccountController : Controller
                     Name = model.Name,
                     Cin = model.Cin,
                     Email = model.Email,
-                    Password = model.Password, // Note: Store hashed password in production
+                    Password = model.Password,
                     Role = "User", // Default role
                     CreatedAt = DateTime.UtcNow
                 };
@@ -110,9 +111,22 @@ public class AccountController : Controller
     }
 
     [HttpGet]
+    public async Task<IActionResult> AccessDenied()
+    {
+        await _signInManager.SignOutAsync();
+        return RedirectToAction("Login", "Account");
+    }
+
+    [HttpGet]
+    [Authorize]
     public async Task<IActionResult> Profile()
     {
+        //get user
         var user = await _userManager.GetUserAsync(HttpContext.User);
+
+        //get employee
+        var employee = _context.Employees.Where(e => e.Email == user.Email).FirstOrDefault();
+
         //check roles
         var roles = await _userManager.GetRolesAsync(user);
         if (roles.Contains("Admin"))
@@ -122,14 +136,73 @@ public class AccountController : Controller
         }
 
         ViewData["Role"] = "User";
-        return View();
+        return View(employee);
     }
 
-
-    [HttpGet]
-    public async Task<IActionResult> AccessDenied()
+    [HttpPost]
+    [Authorize]
+    public async Task<IActionResult> Profile(Employee model)
     {
-        await _signInManager.SignOutAsync();
-        return RedirectToAction("Login", "Account");
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                // Get user
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                if (user == null)
+                {
+                    TempData["Error"] = "User not found!";
+                    return View(model);
+                }
+
+                // Get employee
+                var employee = _context.Employees.FirstOrDefault(e => e.Email == user.Email);
+                if (employee == null)
+                {
+                    TempData["Error"] = "Employee not found!";
+                    return View(model);
+                }
+
+                // Validate email uniqueness
+                if (!string.Equals(employee.Email, model.Email, StringComparison.OrdinalIgnoreCase))
+                {
+                    var emailExists = await _userManager.FindByEmailAsync(model.Email);
+                    if (emailExists != null && emailExists.Id != user.Id)
+                    {
+                        ModelState.AddModelError("Email", "This email is already in use.");
+                        return View(model);
+                    }
+                }
+
+                // Update employee
+                employee.Name = model.Name;
+                employee.Cin = model.Cin;
+                employee.Email = model.Email;
+
+                // Update user
+                var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
+                var setUserNameResult = await _userManager.SetUserNameAsync(user, model.Email);
+
+                if (!setEmailResult.Succeeded || !setUserNameResult.Succeeded)
+                {
+                    TempData["Error"] = "An error occurred while updating your account!";
+                    return View(model);
+                }
+
+                // Save changes
+                _context.Employees.Update(employee);
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = "Account Updated Successfully!";
+                return View(employee);
+            }
+            catch (Exception e)
+            {
+                TempData["Error"] = "An error occurred while updating your account!";
+                return View(model);
+            }
+        }
+
+        return View(model);
     }
 }

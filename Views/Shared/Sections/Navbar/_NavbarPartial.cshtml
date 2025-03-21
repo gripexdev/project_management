@@ -1,182 +1,186 @@
 @* ! Brand demo (display only for navbar-full and hide on below xl) *@
 @if (ViewData["navbarFull"] != null)
 {
-  <div class="navbar-brand app-brand demo d-none d-xl-flex py-0 me-4">
-    <a asp-controller="Dashboards" asp-action="Index" class="app-brand-link gap-2">
-      <span class="app-brand-logo demo">
-        @await Html.PartialAsync("../_Partials/_Macros")
-      </span>
-      <span class="app-brand-text demo menu-text fw-bold">@TempData.Peek("appName")</span>
-    </a>
-  </div>
+    <div class="navbar-brand app-brand demo d-none d-xl-flex py-0 me-4">
+        <a asp-controller="Dashboards" asp-action="Index" class="app-brand-link gap-2">
+            <span class="app-brand-logo demo">
+                @await Html.PartialAsync("../_Partials/_Macros")
+            </span>
+            <span class="app-brand-text demo menu-text fw-bold">@TempData.Peek("appName")</span>
+        </a>
+    </div>
 }
 
 @* ! Not required for layout-without-menu *@
 @if (ViewData["navbarHideToggle"] == null)
 {
-  <div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
-    <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
-      <i class="bx bx-menu bx-md"></i>
-    </a>
-  </div>
+    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
+        <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
+            <i class="bx bx-menu bx-md"></i>
+        </a>
+    </div>
 }
 
 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
 
-  <!-- Search -->
-  <div class="navbar-nav align-items-center">
-    <div class="nav-item d-flex align-items-center">
-      <i class="bx bx-search bx-md"></i>
-      <input type="text" class="form-control border-0 shadow-none ps-1 ps-sm-2" placeholder="Search..."
-        aria-label="Search...">
-    </div>
-  </div>
-  <!-- /Search -->
-
-  <ul class="navbar-nav flex-row align-items-center ms-auto">
-
-    <!-- Notifications -->
-    @if (User.IsInRole("User"))
-    {
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown"
-          aria-expanded="false">
-          <i class="bx bx-bell bx-md"></i> <!-- Notification icon -->
-          <!-- Hide badge if there are no notifications -->
-          <span id="notificationBadge" class="badge bg-danger" style="display: none;">0</span>
-        </a>
-        <ul id="notificationList" class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="notificationsDropdown"
-          style="width: 300px;">
-          <li class="dropdown-header">
-            <h6 class="mb-0">Notifications</h6>
-            <small class="text-muted">You have <span id="notificationCount">0</span> new notifications</small>
-          </li>
-          <li>
-            <hr class="dropdown-divider">
-          </li>
-          <!-- Notifications will be dynamically loaded here -->
-          <div id="notificationItems" class="notification-items">
-            <!-- Notification items will be inserted here by JavaScript -->
-          </div>
-          <!-- Replace "View all notifications" with a cool message -->
-          <li class="dropdown-footer text-center">
-            <p class="text-muted mb-0">You're all caught up! 🎉</p>
-          </li>
-        </ul>
-      </li>
-    }
-    <!-- /Notifications -->
-
-    <!-- User -->
-    <li class="nav-item navbar-dropdown dropdown-user dropdown">
-      <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
-        <div class="avatar avatar-online">
-          <img src="~/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle">
+    <!-- Search -->
+    <div class="navbar-nav align-items-center">
+        <div class="nav-item d-flex align-items-center">
+            <i class="bx bx-search bx-md"></i>
+            <input type="text" class="form-control border-0 shadow-none ps-1 ps-sm-2" placeholder="Search..."
+                aria-label="Search...">
         </div>
-      </a>
-      <ul class="dropdown-menu dropdown-menu-end">
-        <li>
-          <a class="dropdown-item" href="javascript:void(0);">
-            <div class="d-flex">
-              <div class="flex-shrink-0 me-3">
-                <div class="avatar avatar-online">
-                  <img src="~/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle">
-                </div>
-              </div>
-              <div class="">
-                <h6 class="mt-2">@User.Identity.Name</h6>
-              </div>
-            </div>
-          </a>
-        </li>
-        <li>
-          <div class="dropdown-divider my-1"></div>
-        </li>
-        <li>
-          <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
-            <i class="bx bx-user bx-md me-2"></i>
-            <span>My Profile</span>
-          </a>
-        </li>
-        <li>
-          <div class="dropdown-divider my-1"></div>
-        </li>
-        @if (User.Identity.IsAuthenticated)
+    </div>
+    <!-- /Search -->
+
+    <ul class="navbar-nav flex-row align-items-center ms-auto">
+
+        <!-- Notifications -->
+        @if (User.IsInRole("User"))
         {
-          <li>
-            <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
-              <i class="bx bx-power-off bx-md me-2"></i>
-              <span>Log Out</span>
-            </a>
-          </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bx bx-bell bx-md"></i> <!-- Notification icon -->
+                    <!-- Hide badge if there are no notifications -->
+                    <span id="notificationBadge" class="badge bg-danger" style="display: none;">0</span>
+                </a>
+                <ul id="notificationList" class="dropdown-menu dropdown-menu-end p-2"
+                    aria-labelledby="notificationsDropdown" style="width: 300px;">
+                    <li class="dropdown-header">
+                        <h6 class="mb-0">Notifications</h6>
+                        <small class="text-muted">You have <span id="notificationCount">0</span> new notifications</small>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <!-- Notifications will be dynamically loaded here -->
+                    <div id="notificationItems" class="notification-items">
+                        <!-- Notification items will be inserted here by JavaScript -->
+                    </div>
+                    <!-- Replace "View all notifications" with a cool message -->
+                    <li class="dropdown-footer text-center">
+                        <p class="text-muted mb-0">You're all caught up! 🎉</p>
+                    </li>
+                </ul>
+            </li>
         }
+        <!-- /Notifications -->
 
-      </ul>
-    </li>
-    <!--/ User -->
+        <!-- User -->
+        <li class="nav-item navbar-dropdown dropdown-user dropdown">
+            <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
+                <div class="avatar avatar-online">
+                    <img src="~/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle">
+                </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <a class="dropdown-item" href="javascript:void(0);">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0 me-3">
+                                <div class="avatar avatar-online">
+                                    <img src="~/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle">
+                                </div>
+                            </div>
+                            <div class="">
+                                <h6 class="mt-2">@User.Identity.Name</h6>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <div class="dropdown-divider my-1"></div>
+                </li>
+                @if (User.IsInRole("User"))
+                {
+                    <li>
+                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                            <i class="bx bx-user bx-md me-2"></i>
+                            <span>My Profile</span>
+                        </a>
+                    </li>
+                }
 
-  </ul>
+                <li>
+                    <div class="dropdown-divider my-1"></div>
+                </li>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li>
+                        <a class="dropdown-item" asp-controller="Account" asp-action="Logout">
+                            <i class="bx bx-power-off bx-md me-2"></i>
+                            <span>Log Out</span>
+                        </a>
+                    </li>
+                }
+
+            </ul>
+        </li>
+        <!--/ User -->
+
+    </ul>
 </div>
 
 
 <!-- Script to fetch notifications -->
 @if (User.IsInRole("User"))
 {
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const notificationBadge = document.getElementById('notificationBadge');
-      const notificationCount = document.getElementById('notificationCount');
-      const notificationItems = document.getElementById('notificationItems');
-      const dropdownFooter = document.querySelector('#notificationList .dropdown-footer');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const notificationBadge = document.getElementById('notificationBadge');
+            const notificationCount = document.getElementById('notificationCount');
+            const notificationItems = document.getElementById('notificationItems');
+            const dropdownFooter = document.querySelector('#notificationList .dropdown-footer');
 
-      async function fetchNotifications() {
-        const response = await fetch('/UserHome/GetNotifications');
-        const notifications = await response.json();
+            async function fetchNotifications() {
+                const response = await fetch('/UserHome/GetNotifications');
+                const notifications = await response.json();
 
-        // Update badge count
-        if (notifications.length > 0) {
-          notificationBadge.textContent = notifications.length;
-          notificationBadge.style.display = 'inline-block'; // Show badge
-          notificationCount.textContent = notifications.length;
-          dropdownFooter.innerHTML = `<p class="text-muted mb-0">You're all caught up! 🎉</p>`; // Update footer message
-        } else {
-          notificationBadge.style.display = 'none'; // Hide badge
-          notificationCount.textContent = '0';
-          dropdownFooter.innerHTML = `<p class="text-muted mb-0">No new notifications. 🎉</p>`; // Update footer message
-        }
+                // Update badge count
+                if (notifications.length > 0) {
+                    notificationBadge.textContent = notifications.length;
+                    notificationBadge.style.display = 'inline-block'; // Show badge
+                    notificationCount.textContent = notifications.length;
+                    dropdownFooter.innerHTML = `<p class="text-muted mb-0">You're all caught up! 🎉</p>`; // Update footer message
+                } else {
+                    notificationBadge.style.display = 'none'; // Hide badge
+                    notificationCount.textContent = '0';
+                    dropdownFooter.innerHTML = `<p class="text-muted mb-0">No new notifications. 🎉</p>`; // Update footer message
+                }
 
-        // Clear existing notifications
-        notificationItems.innerHTML = '';
+                // Clear existing notifications
+                notificationItems.innerHTML = '';
 
-        // Populate dropdown with notifications
-        notifications.forEach(notification => {
-          const notificationItem = document.createElement('div');
-          notificationItem.classList.add('notification-item', 'p-2', 'mb-2', 'border-bottom');
-          notificationItem.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <p class="mb-1">${notification.message}</p>
-                <small class="text-muted">${new Date(notification.createdAt).toLocaleString()}</small>
-              </div>
-              <button class="btn btn-sm btn-link mark-as-read" data-id="${notification.id}">
-                <i class="bx bx-check"></i>
-              </button>
-            </div>
-          `;
-          notificationItems.appendChild(notificationItem);
+                // Populate dropdown with notifications
+                notifications.forEach(notification => {
+                    const notificationItem = document.createElement('div');
+                    notificationItem.classList.add('notification-item', 'p-2', 'mb-2', 'border-bottom');
+                    notificationItem.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <p class="mb-1">${notification.message}</p>
+                    <small class="text-muted">${new Date(notification.createdAt).toLocaleString()}</small>
+                  </div>
+                  <button class="btn btn-sm btn-link mark-as-read" data-id="${notification.id}">
+                    <i class="bx bx-check"></i>
+                  </button>
+                </div>
+              `;
+                    notificationItems.appendChild(notificationItem);
+                });
+
+                // Add event listeners for "Mark as Read"
+                document.querySelectorAll('.mark-as-read').forEach(button => {
+                    button.addEventListener('click', async function () {
+                        const notificationId = this.getAttribute('data-id');
+                        await fetch(`/UserHome/MarkNotificationAsRead/${notificationId}`, { method: 'POST' });
+                        fetchNotifications(); // Refresh notifications
+                    });
+                });
+            }
+
+            fetchNotifications();
         });
-
-        // Add event listeners for "Mark as Read"
-        document.querySelectorAll('.mark-as-read').forEach(button => {
-          button.addEventListener('click', async function () {
-            const notificationId = this.getAttribute('data-id');
-            await fetch(`/UserHome/MarkNotificationAsRead/${notificationId}`, { method: 'POST' });
-            fetchNotifications(); // Refresh notifications
-          });
-        });
-      }
-
-      fetchNotifications();
-    });
-  </script>
+    </script>
 }
