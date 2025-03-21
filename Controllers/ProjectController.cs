@@ -365,7 +365,7 @@ namespace ProjectDashboard.Controllers
 
         // Unassign Employee from Project and Delete Related Tasks
         [HttpPost]
-        public IActionResult UnassignEmployeeFromProject([FromBody] UnassignEmployeeViewModel model)
+        public async Task<IActionResult> UnassignEmployeeFromProject([FromBody] UnassignEmployeeViewModel model)
         {
             try
             {
@@ -376,8 +376,10 @@ namespace ProjectDashboard.Controllers
                 }
 
                 // Check if the employee is assigned to the project
-                var projectEmployee = _context.ProjectEmployees
-                    .FirstOrDefault(pe => pe.ProjectId == model.ProjectId && pe.EmployeeId == model.EmployeeId);
+                var projectEmployee = await _context.ProjectEmployees
+                    .Include(pe => pe.Project) // Include project details for notification
+                    .Include(pe => pe.Employee) // Include employee details for notification
+                    .FirstOrDefaultAsync(pe => pe.ProjectId == model.ProjectId && pe.EmployeeId == model.EmployeeId);
 
                 if (projectEmployee == null)
                 {
@@ -385,15 +387,21 @@ namespace ProjectDashboard.Controllers
                 }
 
                 // Delete all tasks related to the employee in this project
-                var tasksToDelete = _context.Tasks
+                var tasksToDelete = await _context.Tasks
                     .Where(t => t.ProjectId == model.ProjectId && t.EmployeeId == model.EmployeeId)
-                    .ToList();
+                    .ToListAsync();
 
                 _context.Tasks.RemoveRange(tasksToDelete);
 
                 // Remove the employee from the project
                 _context.ProjectEmployees.Remove(projectEmployee);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
+
+                // Create notification for the unassigned employee
+                await _notificationService.CreateNotificationAsync(
+                    projectEmployee.EmployeeId,
+                    $"You have been unassigned from the project: {projectEmployee.Project.Name}"
+                );
 
                 return Json(new { success = true, message = "Employee unassigned successfully and related tasks deleted." });
             }
