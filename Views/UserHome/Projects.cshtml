@@ -1,10 +1,10 @@
 @model ProjectDashboard.Models.UserHomeViewModel
 
 @{
-  ViewData["Title"] = "User Projects Page";
-  ViewData["navbarHideToggle"] = true;
-  ViewData["isMenu"] = false;
-  ViewData["menuFixed"] = "";
+    ViewData["Title"] = "User Projects Page";
+    ViewData["navbarHideToggle"] = true;
+    ViewData["isMenu"] = false;
+    ViewData["menuFixed"] = "";
 }
 @* ************** Content ************** *@
 <div class="card">
@@ -49,7 +49,7 @@
                                         data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal"
-                                            data-bs-target="#editEmployeeModal_@project.Id">
+                                            data-bs-target="#viewTask_@project.Id">
                                             <i class="bx bx-edit-alt me-1"></i> View Tasks
                                         </a>
                                     </div>
@@ -57,58 +57,44 @@
                             </td>
                         </tr>
 
-                        <!-- Edit Employee Modal -->
-                        @* <div class="modal fade" id="editEmployeeModal_@employee.Id" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog">
+                        <div class="modal fade" id="viewTask_@project.Id" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Edit Employee</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        <h5 class="modal-title">My Tasks for Project <b>@project.Name</b></h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
                                     </div>
-                                    <form method="post" asp-action="Update" asp-asp-controller="Employee">
-                                        <input type="hidden" name="Id" value="@employee.Id" />
-                                        <input type="hidden" name="Password" value="@employee.Password" />
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label class="form-label">Name</label>
-                                                <input type="text" id="name" name="Name" value="@employee.Name"
-                                                    class="form-control">
-                                                <span class="text-danger" id="nameError"></span>
+                                    <div class="modal-body">
+                                        @if (project.Tasks == null || !project.Tasks.Any())
+                                        {
+                                            <p class="text-center">No tasks available for this project.</p>
+                                        }
+                                        else
+                                        {
+                                            <div class="list-group">
+                                                @foreach (var task in project.Tasks)
+                                                {
+                                                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                                                        <div class="d-flex w-100 justify-content-between">
+                                                            <h6 class="mb-1">@task.TaskName</h6>
+                                                            <small class="text-muted" style="font-weight: bolder;">End: @(task.EndDate.HasValue ? task.EndDate.Value.ToString("yyyy-MM-dd") : "No due date")
+</small>
+                                                        </div>
+                                                        <p class="mb-1">@task.TaskDescription</p>
+                                                        <small class="text-muted">Status: <span
+                                                                class="badge bg-label-@(task.Status == ProjectDashboard.Models.TaskStatus.Completed ? "success" : "warning") me-1">@task.Status</span></small>
+                                                    </div>
+                                                }
                                             </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Cin</label>
-                                                <input type="text" id="Cin" name="Cin" value="@employee.Cin"
-                                                    class="form-control">
-                                                <span class="text-danger" id="CinError"></span>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Email</label>
-                                                <input type="email" id="Email" name="Email" value="@employee.Email"
-                                                    class="form-control">
-                                                <span class="text-danger" id="EmailError"></span>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label">Role</label>
-                                                <select name="Role" id="Role" class="form-select">
-                                                    <option value="User"
-                                                        selected="@(employee.Role == "User" ? "selected" : null)">User</option>
-                                                    <option value="Admin"
-                                                        selected="@(employee.Role == "Admin" ? "selected" : null)">Admin
-                                                    </option>
-                                                </select>
-                                                <span class="text-danger" id="RoleError"></span>
-                                            </div>
-
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                                        </div>
-                                    </form>
+                                        }
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div> *@
+                        </div>
 
                     }
 
@@ -166,15 +152,15 @@
             toastElement.setAttribute('data-bs-delay', '3000');
 
             var toastBody = `
-                                                <div class="toast-header">
-                                                    <i class='bx bx-bell me-2'></i>
-                                                    <strong class="me-auto">Notification</strong>
-                                                    <small>Just now</small>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                                </div>
-                                                <div class="toast-body">
-                                                    ${message}
-                                                </div>`;
+                                                    <div class="toast-header">
+                                                        <i class='bx bx-bell me-2'></i>
+                                                        <strong class="me-auto">Notification</strong>
+                                                        <small>Just now</small>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="toast-body">
+                                                        ${message}
+                                                    </div>`;
 
             toastElement.innerHTML = toastBody;
 
@@ -190,7 +176,7 @@
             {
                 <text>
                     showToast('success', '@TempData["Success"]');
-                                                                            @TempData.Remove("Success");
+                                                                                    @TempData.Remove("Success");
                 </text>
         }
 
@@ -198,7 +184,7 @@
             {
                 <text>
                     showToast('error', '@TempData["Error"]');
-                                                                            @TempData.Remove("Error");
+                                                                                    @TempData.Remove("Error");
                 </text>
         }
     </script>

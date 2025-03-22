@@ -12,6 +12,8 @@ namespace ProjectDashboard.Models
         public int overdueTasksCount { get; set; }
         public int activeProjectsCount { get; set; }
         public int completedProjectsCount { get; set; }
+        public int inProgressProjectsCount { get; set; }
+        public int inProgressTasksCount { get; set;}
         public List<Project>? projects { get; set; }
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }

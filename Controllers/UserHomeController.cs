@@ -98,7 +98,7 @@ namespace ProjectDashboard.Controllers
             userHomeViewModel.overdueTasksCount = employee.Tasks.Count(t => t.EndDate < DateTime.UtcNow && t.Status != Models.TaskStatus.Completed);
             userHomeViewModel.activeProjectsCount = employee.ProjectEmployees.Count(pe => pe.Project.Status == ProjectStatus.InProgress);
             userHomeViewModel.completedProjectsCount = employee.ProjectEmployees.Count(pe => pe.Project.Status == ProjectStatus.Completed);
-
+            userHomeViewModel.inProgressProjectsCount = employee.ProjectEmployees.Count(pe => pe.Project.Status == ProjectStatus.InProgress);
 
             // Kanban data
             userHomeViewModel.tasks = employee.Tasks.ToList();
@@ -135,6 +135,7 @@ namespace ProjectDashboard.Controllers
             // Query ProjectEmployees directly for the authenticated employee
             var projectEmployees = await _context.ProjectEmployees
                 .Include(pe => pe.Project) // Include the related Project
+                .Include(task => task.Project.Tasks)
                 .Where(pe => pe.EmployeeId == employee.Id) // Filter by EmployeeId
                 .ToListAsync();
 
