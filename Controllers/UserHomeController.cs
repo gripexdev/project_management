@@ -175,7 +175,7 @@ namespace ProjectDashboard.Controllers
             }
 
             // Parse the status string into the TaskStatus enum
-            if (Enum.TryParse(typeof(Models.TaskStatus), request.Status, out var parsedStatus) && parsedStatus != null)
+            if (Enum.TryParse(typeof(Models.TaskStatus), request.Status, true, out var parsedStatus) && parsedStatus != null)
             {
                 task.Status = (Models.TaskStatus)parsedStatus;
                 _context.Tasks.Update(task);
