@@ -6,7 +6,7 @@
 }
 
 @section PageStyles {
-<link rel="stylesheet" href="~/vendor/css/pages/page-auth.css">
+  <link rel="stylesheet" href="~/vendor/css/pages/page-auth.css">
 }
 
 @* ************** Content ************** *@
@@ -19,10 +19,9 @@
       <div class="card px-sm-6 px-0">
         <div class="card-body">
           <!-- Logo -->
-          
+
           <!-- /Logo -->
-          <h4 class="mb-1">Adventure starts here 🚀</h4>
-          <p class="mb-6">Make your app management easy and fun!</p>
+          <h4 class="mb-1" style="text-align: center;">Welcome👋</h4>
 
           <form id="formAuthentication" class="mb-6" asp-action="Register" method="post">
             <div asp-validation-summary="All" class="text-danger"></div>
@@ -58,18 +57,8 @@
               <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
-            
 
-            <!-- Terms and Conditions -->
-            <div class="my-8">
-              <div class="form-check mb-0 ms-2">
-                <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms">
-                <label class="form-check-label" for="terms-conditions">
-                  I agree to
-                  <a href="javascript:void(0);">privacy policy & terms</a>
-                </label>
-              </div>
-            </div>
+
 
             <!-- Submit Button -->
             <button class="btn btn-primary d-grid w-100" type="submit">Sign up</button>
