@@ -1,53 +1,32 @@
 services:
-  # Application Service
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: my_app
+  web:
+    build: .
     ports:
-      - "8080:80" # Map port 8080 on host to port 80 in the container
+      - "5001:8080"  # Host:Container port mapping
     environment:
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=
-      - DB_NAME=ProjectDashboardDB
-    volumes:
-      - .:/var/www/html # Mount your local code into the container
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=ProjectDashboardDB;User=root;
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Database Service (MySQL)
   db:
     image: mysql:8.0
-    container_name: my_db
-    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD:
-      MYSQL_DATABASE: ProjectDashboardDB
-      MYSQL_USER: root
-      MYSQL_PASSWORD:
-    ports:
-      - "3306:3306" # Expose MySQL port
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=ProjectDashboardDB
     volumes:
-      - db_data:/var/lib/mysql # Persist MySQL data
+      - mysql_data:/var/lib/mysql  # This references the volume
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
 
-  # phpMyAdmin Service
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: my_phpmyadmin
-    restart: always
-    ports:
-      - "8081:80" # Access phpMyAdmin at http://localhost:8081
-    environment:
-      PMA_HOST: db # The hostname of the database service
-      MYSQL_ROOT_PASSWORD:
-    depends_on:
-      - db
-
-volumes:
-  db_data: # Persistent volume for MySQL data
-
-#   "ConnectionStrings": {
-#   "DefaultConnection": "Server=db;Port=3306;Database=ProjectDashboardDB;User=root;Password=;"
-# }
+volumes:  # THIS SECTION WAS MISSING
+  mysql_data:  # Declares the volume

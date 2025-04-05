@@ -1,14 +1,12 @@
-# Use an official PHP runtime as a parent image
-FROM php:7.4-apache
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0-preview AS build
+WORKDIR /src
+COPY . .
+RUN dotnet restore
+RUN dotnet publish -c Release -o /app
 
-# Install necessary PHP extensions
-RUN docker-php-ext-install mysqli pdo pdo_mysql
-
-# Copy application files into the container
-COPY . /var/www/html/
-
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
-
-# Expose port 80
-EXPOSE 80
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview
+WORKDIR /app
+COPY --from=build /app .
+ENTRYPOINT ["dotnet", "ProjectDashboard.dll"]
